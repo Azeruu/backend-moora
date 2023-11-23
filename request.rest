@@ -1,0 +1,203 @@
+//get all users
+GET http://localhost:5000/users
+
+###
+//get single user
+GET http://localhost:5000/users/a4897d7f-fc42-430b-ad2e-9dca319fac7a
+
+###
+//create user
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "username" : "dimas",
+    "email" : "dimas@gmail.com",
+    "password" : "123456",
+    "confirmPassword" : "123456",
+    "role" : "user"
+}
+
+###
+//update User
+PATCH  http://localhost:5000/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
+Content-Type: application/json
+
+{
+    "username" : "Aufa Updated",
+    "email" : "reza@gmail.com",
+    "password" : "",
+    "confirmPassword" : "",
+    "role" : "user"
+}
+###
+//hapus user
+DELETE  http://localhost:5000/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
+
+###
+//Login admin
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email" : "admin@gmail.com",
+    "password" : "123"
+}
+###
+//Login user
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email" : "dimas@gmail.com",
+    "password" : "123456"
+}
+
+###
+//Me
+GET http://localhost:5000/me
+
+###
+//Logout
+DELETE  http://localhost:5000/logout
+
+
+###
+//get all data siswa
+GET http://localhost:5000/data_siswa
+
+###
+//get data siswa by ID
+GET http://localhost:5000/data_siswa/263cccb3-7550-461e-82e7-85e46d1149d1
+
+###
+//POST data Siswa
+POST http://localhost:5000/data_siswa
+Content-Type: application/json
+
+{
+    "nama_jalur":"Afirmasi",
+    "NISN":"0921831928",
+    "nama_lengkap":"JONI",
+    "jenis_kelamin":"laki-laki",
+    "NIK":"1290389213",
+    "tempat_lahir":"Tangerang",
+    "tgl_lahir":"20 September 2001",
+    "usia":"20",
+    "asal_sekolah":"SDN 1 sukatani",
+    "nama_jalan":"jl.kp.situgabug",
+    "no_rumah":"33",
+    "RT":"01",
+    "RW":"04",
+    "Desa":"Sukatani",
+    "Kecamatan":"Cisoka",
+    "jarak":"2"
+}
+
+###
+PATCH  http://localhost:5000/data_siswa/22f2a72a-e401-46db-8d5e-b49a05d463d8
+Content-Type: application/json
+
+{
+    "nama_lengkap":"fawaz",
+    "tempat_lahir":"Tangerang",
+    "tgl_lahir":"14 September 2001",
+    "alamat":"Cisoka",
+    "kota":"Cisoka",
+    "jenis_kelamin":"Laki-Laki",
+    "no_telp":"081318251213",
+    "email":"fawaz@gmail.com",
+    "nama_wali":"Dulhalim",
+    "asal_sekolah":"SMAN 1 Kab.Tangerang",
+    "agama":"Islam"
+}
+###
+DELETE  http://localhost:5000/data_siswa/36198941-ecd1-42ed-86aa-ace90ba323c0
+
+###
+POST http://localhost:5000/rekap_nilai
+Content-Type: application/json
+{
+        "pkn1" : "pkn1",
+        "bindo1" : "bindo1",
+        "mtk1" : "mtk1",
+        "ips1" : "ips1",
+        "ipa1" : "ipa1",
+        "pkn2" : "pkn2",
+        "bindo2" : "bindo2",
+        "mtk2" :"mtk2",
+        "ips2" : "ips2",
+        "ipa2" : "ipa2",
+        "pkn3" :"pkn3",
+        "bindo3" :"bindo3",
+        "mtk3" :"mtk3",
+        "ips3" :"ips3",
+        "ipa3" :"ipa3",
+        "pkn4" :"pkn4",
+        "bindo4" :"bindo4",
+        "mtk4" :"mtk4",
+        "ips4" : "ips4",
+        "ipa4" : "ipa4",
+        "pkn5" : "pkn5",
+        "bindo5" : "bindo5",
+        "mtk5" : "mtk5",
+        "ips5" : "ips5",
+        "ipa5" : "ipa5"
+}
+###
+POST http://localhost:5000/data_siswa
+Content-Type: application/json
+
+{
+    "nama_jalur" : "Afirmasi",
+    "NISN" : 131231231,
+    "nama_lengkap" : "reza",
+    "jenis_kelamin" : "laki_laki",
+    "NIK" : 213123123,
+    "tempat_lahir" : "tangerang",
+    "tgl_lahir" : "14-09-2001",
+    "usia": 23,
+    "asal_sekolah": "SDN Sukatani 1",
+    "nama_jalan" : "Jl.Kp,Situgabug",
+    "no_rumah" : "34",
+    "RT": "001",
+    "RW": "004",
+    "Desa" : "Sukatani",
+    "Kecamatan": "Cisoka",
+    "jarak" : 2,
+    "userId" : 1,
+    "jalurId" : 2
+}
+
+###
+POST http://localhost:5000/data_nilai
+Content-Type: application/json
+
+{
+    "dataSiswaId": 17,
+    "pkn1": 1,
+    "bindo1": 1,
+    "mtk1": 1,
+    "ips1": 1,
+    "ipa1": 1,
+    "pkn2": 1,
+    "bindo2": 1,
+    "mtk2": 1,
+    "ips2": 1,
+    "ipa2": 1,
+    "pkn3": 1,
+    "bindo3": 1,
+    "mtk3": 2,
+    "ips3": 1,
+    "ipa3": 1,
+    "pkn4": 1,
+    "bindo4": 1,
+    "mtk4": 1,
+    "ips4": 2,
+    "ipa4": 5,
+    "pkn5": 1,
+    "bindo5": 1,
+    "mtk5": 1,
+    "ips5": 6,
+    "ipa5": 7
+}
