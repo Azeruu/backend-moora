@@ -113,7 +113,7 @@ export const createNilai = async (req, res) => {
     ipa5,
   } = req.body;
   try {
-    await Nilai.create({
+    const siswaBaru = await Nilai.create({
       dataSiswaId: dataSiswaId,
       pkn1: pkn1,
       bindo1: bindo1,
@@ -141,7 +141,7 @@ export const createNilai = async (req, res) => {
       ips5: ips5,
       ipa5: ipa5,
     });
-    res.status(201).json({ msg: "Data Nilai Berhasil Diinput" });
+    res.status(201).json({ msg: "Data Nilai Berhasil Diinput", idSiswaBaru : siswaBaru.dataSiswaId});
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
