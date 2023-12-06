@@ -10,6 +10,7 @@ const dbRoot  = process.env.DB_ROOT || "root";
 const db = new Sequelize(dbName,dbRoot,'',{
     host: dbHost,
     dialect: dbDialect,
+    logging: false,
 });
 
 export default db;

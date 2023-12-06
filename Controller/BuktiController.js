@@ -105,271 +105,137 @@ export const saveBukti = async (req, res) => {
 
 //UPDATE Bukti
 export const updateBukti = async (req, res) => {
-    const bukti = await Bukti.findOne({
-        where :{
-            dataSiswaId : req.params.id
+    try {
+        const dataSiswaId = req.params.id;
+        let ijazah_sk='';
+        let kartu_keluarga='';
+        let akta_kelahiran='';
+        let SS_lulus_dapodik='';
+        const allowedType = ['.png','.jpeg','.jpg'];
+
+        // Untuk File 1
+        if (req.files?.ijazah_sk === undefined ) {
+            const bukti = await Bukti.findOne({
+                where :{
+                    dataSiswaId : req.params.id
+                }
+                });
+                if(!bukti) {
+                    return res.status(404).json({msg:"Data tidak ditemukan"});
+                };
+            ijazah_sk = bukti.ijazah_sk;
         }
-    });
-    if(!bukti) return res.status(404).json({msg:"Data tidak ditemukan"});
-    const dataSiswaId = req.params.id;
-    const file1 = req.files && req.files.ijazah_sk;
-    const file2 = req.files && req.files.kartu_keluarga;
-    const file3 = req.files && req.files.akta_kelahiran;
-    const file4 = req.files && req.files.SS_lulus_dapodik;
-    const allowedType = ['.png','.jpeg','.jpg'];
+        else{
+            const file1 = req.files.ijazah_sk;
+            const fileSize1 = file1.data.length;
+            const extension1 = path.extname(file1.name);
+            ijazah_sk = file1.md5 + extension1;
 
-    // FILE 1
-    if (file1) {
-        const fileSize1 = file1.data.length;
-        const extension1 = path.extname(file1.name);
-        const ijazah_sk = file1.md5 + extension1;
-        if(!allowedType.includes(extension1.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
-        if(fileSize1 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
-        const url1 = `${req.protocol}://${req.get("host")}/images/${ijazah_sk}`;
-        const targetPaths1 = {
-            ijazah_sk: `./public/images/${ijazah_sk}`
-        };
-        // fs.unlinkSync(targetPaths1.ijazah_sk);
+            if(!allowedType.includes(extension1.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
+            if(fileSize1 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
+            fs.unlinkSync(`./public/images/${req.body.old_ijazah_sk}`);
 
-        await file1.mv(`./public/images/${targetPaths1.ijazah_sk}`, async(err) =>{
-            if(err) return res.status(500).json({msg:err.message});
-            try {
-                await Bukti.update({
-                    dataSiswaId,
-                    ijazah_sk: ijazah_sk,
-                    kartu_keluarga,
-                    akta_kelahiran,
-                    SS_lulus_dapodik,
-                    url_ijazah: url1,
-                    url_akta,
-                    url_kk,
-                    url_dapodik,
-                },{
-                    where:{
-                        dataSiswaId:dataSiswaId,
-                    }
+            file1.mv(`./public/images/${ijazah_sk}`,(err) => {
+                if (err) return res.status(500).json({ msg: "Gagal mengganti file ijazah_sk" + err.message });
+            });
+        }
+
+        // Untuk file 2
+        if (req.files?.kartu_keluarga === undefined ) {
+            const bukti = await Bukti.findOne({
+                where :{
+                    dataSiswaId : req.params.id
+                }
                 });
-                res.status(200).json({msg:"Berhasil memperbarui"})
-            } catch (error) {
-                console.log(error.message);
+                if(!bukti) {
+                    return res.status(404).json({msg:"Data tidak ditemukan"});
+                };
+            kartu_keluarga = bukti.kartu_keluarga;
+        }
+        else{
+            const file2 = req.files.kartu_keluarga;
+            const fileSize2 = file2.data.length;
+            const extension2 = path.extname(file2.name);
+            kartu_keluarga = file2.md5 + extension2;
+
+            if(!allowedType.includes(extension2.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
+            if(fileSize2 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
+            fs.unlinkSync(`./public/images/${req.body.old_kartu_keluarga}`);
+
+            file2.mv(`./public/images/${kartu_keluarga}`,(err) => {
+                if (err) return res.status(500).json({ msg: "Gagal mengganti file Kartu Keluarga" + err.message });
+            });
+        }
+
+        // Untuk file 3
+        if (req.files?.akta_kelahiran === undefined ) {
+            const bukti = await Bukti.findOne({
+                where :{
+                    dataSiswaId : req.params.id
+                }
+                });
+                if(!bukti) {
+                    return res.status(404).json({msg:"Data tidak ditemukan"});
+                };
+            akta_kelahiran = bukti.akta_kelahiran;
+        }
+        else{
+            const file3 = req.files.akta_kelahiran;
+            const fileSize3 = file3.data.length;
+            const extension3 = path.extname(file3.name);
+            akta_kelahiran = file3.md5 + extension3;
+
+            if(!allowedType.includes(extension3.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
+            if(fileSize3 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
+            fs.unlinkSync(`./public/images/${req.body.old_akta_kelahiran}`);
+
+            file3.mv(`./public/images/${akta_kelahiran}`,(err) => {
+                if (err) return res.status(500).json({ msg: "Gagal mengganti file Akta Kelahiran" + err.message });
+            });
+        }
+
+        // Untuk File 4
+        if (req.files?.SS_lulus_dapodik === undefined ) {
+            const bukti = await Bukti.findOne({
+                where :{
+                    dataSiswaId : req.params.id
+                }
+                });
+                if(!bukti) {
+                    return res.status(404).json({msg:"Data tidak ditemukan"});
+                };
+                SS_lulus_dapodik = bukti.SS_lulus_dapodik;
+        }
+        else{
+            const file4 = req.files.SS_lulus_dapodik;
+            const fileSize4 = file4.data.length;
+            const extension4 = path.extname(file4.name);
+            SS_lulus_dapodik = file4.md5 + extension4;
+
+            if(!allowedType.includes(extension4.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
+            if(fileSize4 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
+            fs.unlinkSync(`./public/images/${req.body.old_SS_lulus_dapodik}`);
+
+            file4.mv(`./public/images/${SS_lulus_dapodik}`,(err) => {
+                if (err) return res.status(500).json({ msg: "Gagal mengganti file ijazah_sk" + err.message });
+            });
+        }
+
+        await Bukti.update({
+            ijazah_sk: ijazah_sk,
+            kartu_keluarga: kartu_keluarga,
+            akta_kelahiran: akta_kelahiran,
+            SS_lulus_dapodik: SS_lulus_dapodik,
+        },{
+            where: {
+                dataSiswaId : dataSiswaId,
             }
         });
-    }else {
-        // Jika file1 tidak diunggah, gunakan file sebelumnya
-        const url1 = bukti ? bukti.url_ijazah : null;
-        const ijazah_sk = bukti ? bukti.ijazah_sk : null;
-        try {
-            await Bukti.update({
-                dataSiswaId,
-                ijazah_sk,
-                kartu_keluarga: bukti.kartu_keluarga,
-                akta_kelahiran: bukti.akta_kelahiran,
-                SS_lulus_dapodik: bukti.SS_lulus_dapodik,
-                url_ijazah: url1,
-                url_akta: bukti.url_akta,
-                url_kk: bukti.url_kk,
-                url_dapodik: bukti.url_dapodik,
-            }, {
-                where: {
-                    dataSiswaId: dataSiswaId,
-                }
-            });
-            res.status(200).json({ msg: "Berhasil memperbarui" })
-        } catch (error) {
-            console.log(error.message);
-            res.status(500).json({ msg: error.message });
-        };
-    };
-    // FILE 2
-    if (file2) {
-        const fileSize2 = file2.data.length;
-        const extension2 = path.extname(file2.name);
-        const kartu_keluarga = file2.md5 + extension2;
-        const url2 = `${req.protocol}://${req.get("host")}/images/${kartu_keluarga}`;
-        const allowedType = ['.png','.jpeg','.jpg'];
-        if(!allowedType.includes(extension2.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
-        if(fileSize2 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
-        const targetPaths2 = {
-            kartu_keluarga: `./public/images/${kartu_keluarga}`,
-        };
-        // fs.unlinkSync(targetPaths2.kartu_keluarga);
-
-        await file2.mv(`./public/images/${targetPaths2.kartu_keluarga}`, async(err) =>{
-            if(err) return res.status(500).json({msg:err.message});
-            try {
-                await Bukti.update({
-                    dataSiswaId,
-                    ijazah_sk,
-                    kartu_keluarga: kartu_keluarga,
-                    akta_kelahiran,
-                    SS_lulus_dapodik,
-                    url_ijazah,
-                    url_kk:url2,
-                    url_akta,
-                    url_dapodik,
-                },{
-                    where:{
-                        dataSiswaId:req.params.id
-                    }
-                });
-                res.status(200).json({msg:"Berhasil memperbarui"})
-            } catch (error) {
-                console.log(error.message);
-            }
-        });
-    }else {
-        // Jika file2 tidak diunggah, gunakan file sebelumnya
-        const url2 = bukti ? bukti.url_kk : null;
-        const kartu_keluarga = bukti ? bukti.kartu_keluarga : null;
-
-        try {
-            await Bukti.update({
-                dataSiswaId,
-                ijazah_sk: bukti.ijazah_sk,
-                kartu_keluarga,
-                akta_kelahiran: bukti.akta_kelahiran,
-                SS_lulus_dapodik: bukti.SS_lulus_dapodik,
-                url_ijazah: bukti.url_ijazah,
-                url_kk: url2,
-                url_akta: bukti.url_akta,
-                url_dapodik: bukti.url_dapodik,
-            }, {
-                where: {
-                    dataSiswaId: dataSiswaId,
-                }
-            });
-            res.status(200).json({ msg: "Berhasil memperbarui" })
-        } catch (error) {
-            console.log(error.message);
-            res.status(500).json({ msg: error.message });
-        };
-    };
-    if (file3) {
-        const fileSize3 = file3.data.length;
-        const extension3 = path.extname(file3.name);
-        const akta_kelahiran = file3.md5 + extension3;
-        const url3 = `${req.protocol}://${req.get("host")}/images/${akta_kelahiran}`;
-        const allowedType = ['.png','.jpeg','.jpg'];
-        if(!allowedType.includes(extension3.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
-        if(fileSize3 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
-        const targetPaths3 = {
-            akta_kelahiran: `./public/images/${akta_kelahiran}`,
-        };
-        // fs.unlinkSync(targetPaths3.akta_kelahiran);
-        
-        file3.mv(`./public/images/${targetPaths3.akta_kelahiran}`, async(err) =>{
-            if(err) return res.status(500).json({msg:err.message});
-            try {
-                await Bukti.update({
-                    dataSiswaId,
-                    ijazah_sk,
-                    kartu_keluarga,
-                    akta_kelahiran:akta_kelahiran,
-                    SS_lulus_dapodik,
-                    url_ijazah,
-                    url_kk,
-                    url_akta:url3,
-                    url_dapodik,
-                },{
-                    where:{
-                        dataSiswaId:req.params.id
-                    }
-                });
-                res.status(200).json({msg:"Berhasil memperbarui"})
-            } catch (error) {
-                console.log(error.message);
-            }
-        });
-    }else {
-        // Jika file3 tidak diunggah, gunakan file sebelumnya
-        const url3 = bukti ? bukti.url_akta : null;
-        const akta_kelahiran = bukti ? bukti.akta_kelahiran : null;
-
-        try {
-            await Bukti.update({
-                dataSiswaId,
-                ijazah_sk:bukti.ijazah_sk,
-                kartu_keluarga: bukti.kartu_keluarga,
-                akta_kelahiran,
-                SS_lulus_dapodik: bukti.SS_lulus_dapodik,
-                url_ijazah: bukti.url_ijazah,
-                url_kk: bukti.url_kk,
-                url_akta: url3,
-                url_dapodik: bukti.url_dapodik,
-            }, {
-                where: {
-                    dataSiswaId: dataSiswaId,
-                }
-            });
-            res.status(200).json({ msg: "Berhasil memperbarui" })
-        } catch (error) {
-            console.log(error.message);
-            res.status(500).json({ msg: error.message });
-        };
-    };
-    if (file4) {
-        const fileSize4 = file4.data.length;
-        const extension4 = path.extname(file4.name);
-        const SS_lulus_dapodik = file4.md5 + extension4;
-        const url4 = `${req.protocol}://${req.get("host")}/images/${SS_lulus_dapodik}`;
-        const allowedType = ['.png','.jpeg','.jpg'];
-        if(!allowedType.includes(extension4.toLowerCase())) return res.status(422).json({msg:"Invalid image Types"});
-        if(fileSize4 > 5000000) return res.status(422).json({msg:"Ukuran File gambar harus kurang dari 5 mb"});
-        const targetPaths4 = {
-            SS_lulus_dapodik: `./public/images/${SS_lulus_dapodik}`,
-        };
-        // fs.unlinkSync(targetPaths4.SS_lulus_dapodik);
-
-        file4.mv(`./public/images/${targetPaths4.SS_lulus_dapodik}`, async (err) =>{
-            if(err) return res.status(500).json({msg:err.message});
-            try {
-                await Bukti.update({
-                    dataSiswaId,
-                    ijazah_sk,
-                    kartu_keluarga,
-                    akta_kelahiran,
-                    SS_lulus_dapodik:SS_lulus_dapodik,
-                    url_ijazah,
-                    url_akta,
-                    url_kk,
-                    url_dapodik:url4,
-                },{
-                    where:{
-                        dataSiswaId:req.params.id
-                    }
-                });
-                res.status(200).json({msg:"Berhasil memperbarui"})
-            } catch (error) {
-                console.log(error.message);
-            }
-        });
-    }else {
-        // Jika file1 tidak diunggah, gunakan file sebelumnya
-        const url4 = bukti ? bukti.url_dapodik : null;
-        const SS_lulus_dapodik = bukti ? bukti.SS_lulus_dapodik : null;
-
-        try {
-            await Bukti.update({
-                dataSiswaId,
-                ijazah_sk:bukti.ijazah_sk,
-                kartu_keluarga: bukti.kartu_keluarga,
-                akta_kelahiran: bukti.akta_kelahiran,
-                SS_lulus_dapodik,
-                url_ijazah: bukti.url_ijazah,
-                url_akta: bukti.url_akta,
-                url_kk: bukti.url_kk,
-                url_dapodik: url4,
-            }, {
-                where: {
-                    dataSiswaId: dataSiswaId,
-                }
-            });
-            res.status(200).json({ msg: "Berhasil memperbarui" })
-        } catch (error) {
-            console.log(error.message);
-            res.status(500).json({ msg: error.message });
-        };
-};
+        res.status(201).json({ msg: "Upload Bukti Berhasil" });
+    } catch (error){
+        console.error(error.message);
+        res.status(500).json({msg:"terjadi kesalahan Saat Mengedit data"});
+    }
 };
 //HAPUS Bukti
 export const deleteBukti = async (req, res) => {
