@@ -7,7 +7,7 @@ GET http://localhost:5000/users/a4897d7f-fc42-430b-ad2e-9dca319fac7a
 
 ###
 //create user
-POST http://localhost:5000/users
+POST http://localhost:3001/users
 Content-Type: application/json
 
 {

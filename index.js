@@ -13,6 +13,7 @@ import JalurRoute from "./Routes/JalurRoutes.js";
 import KriteriaRoute from "./Routes/KriteriaRoutes.js";
 import HasilRoute from "./Routes/HasilRoutes.js";
 import BuktiRoute from "./Routes/BuktiRoutes.js"
+import PingRoutes from "./Routes/PingRoutes.js";
 import db from "./config/Database.js";
 dotenv.config();
 
@@ -38,10 +39,13 @@ app.use(session({
         secure: 'auto'
     }
 }));
+
 app.use(cors({
     credentials: true,
-    origin: process.env.ORIGIN_DOMAIN 
+    // origin: process.env.ORIGIN_DOMAIN 
+    origin: true
 }));
+
 app.use(FileUpload());
 app.use(express.static("public"));
 app.use(express.json());
@@ -54,6 +58,7 @@ app.use(BuktiRoute);
 app.use(RekapNilaiRoute);
 app.use(SiswaRoute);
 app.use(AuthRoutes);
+app.use(PingRoutes);
 
 // store.sync();
 

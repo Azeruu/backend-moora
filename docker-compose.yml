@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  mariadb:
+    container_name: ${DB_CONTAINER_NAME}
+    image: mariadb:latest
+    ports:
+    - ${DB_PORT}:3306
+    volumes:
+    - ./mariadb-data:/var/lib/mysql
+    environment:
+    - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    - MYSQL_USER="user"
+    - MYSQL_PASSWORD="password"
+    - MYSQL_DATABASE=${DB_NAME}
+
+  phpmyadmin:
+    container_name: ${PHPMYADMIN_CONTAINER_NAME}
+    image: phpmyadmin
+    ports:
+    - 8000:80
+    environment:
+    - PMA_ARBITRARY=1
