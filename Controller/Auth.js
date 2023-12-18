@@ -11,10 +11,12 @@ export const Login = async(req,res) => {
     const matchPass = await argon2.verify(user.password, req.body.password);
     if(!matchPass) return res.status(400).json({msg:"Password Salah"});
     req.session.userId = user.uuid;
+    res.cookie('sessionId', req.session.userId , {httpOnly:true, secure: true, sameSite:'none'});
     const uuid = user.uuid;
     const username = user.username;
     const email = user.email;
     const role = user.role;
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.status(200).json({uuid,username,email,role});
 }
 
