@@ -36,14 +36,18 @@ app.use(session({
     saveUninitialized: true,
     store: store,
     cookie: {
-        secure: 'auto'
+        secure: 'auto',
+        sameSite:'none'
     }
 }));
 
 app.use(cors({
-    credentials: true,
-    // origin: process.env.ORIGIN_DOMAIN 
-    origin: true
+    origin: 'http://47.254.65.36:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Mengizinkan semua metode
+    allowedHeaders: 'Content-Type', // Mengizinkan semua header
+    credentials: true, // Mengizinkan penggunaan kredensial (cookie)
+    optionsSuccessStatus: 204,
+    
 }));
 
 app.use(FileUpload());
