@@ -19,35 +19,37 @@ dotenv.config();
 
 const app = express();
 
-// (async () => {
-//     await db.sync({alter:true});
-//     console.log("berhasil tersingkron semua");
-// })();
+ (async () => {
+     await db.sync();
+    console.log("berhasil tersingkron semua");
+ })();
 
 const sessionStore = SequelizeStore(session.Store); 
 
 const store = new sessionStore({
     db: db
 });
-
+// app.set('trust proxy', true);
 app.use(session({
     secret: process.env.SESS_SECRET,
     resave: false,
     saveUninitialized: true,
     store: store,
     cookie: {
-        secure: 'auto',
-        sameSite:'none'
-    }
+        secure:true,
+        sameSite: 'None',
+        httpOnly: true,
+        path: '/',
+    },
+    proxy:true
 }));
 
 app.use(cors({
-    origin: 'http://47.254.65.36:3000',
+    origin: 'https://frontend.azeru.live',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Mengizinkan semua metode
     allowedHeaders: 'Content-Type', // Mengizinkan semua header
     credentials: true, // Mengizinkan penggunaan kredensial (cookie)
     optionsSuccessStatus: 204,
-    
 }));
 
 app.use(FileUpload());
@@ -64,7 +66,7 @@ app.use(SiswaRoute);
 app.use(AuthRoutes);
 app.use(PingRoutes);
 
-// store.sync();
+ store.sync();
 
 app.listen(process.env.APP_PORT, () => {
     console.log("Server running on port " + process.env.APP_PORT);
