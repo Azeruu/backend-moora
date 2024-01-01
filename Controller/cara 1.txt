@@ -1,0 +1,48 @@
+const weightPKN = 0.1;
+const weightBINDO = 0.1;
+const weightMTK = 0.1;
+const weightIPS = 0.1;
+const weightIPA = 0.1;
+const weightDistance = 0.3;
+const weightUsia = 0.2;
+
+// Fungsi untuk melakukan normalisasi pada kriteria yang perlu di-minimumkan (umur dan jarak)
+const normalizeMinimize = (value, min, max) => (value - min) / (max - min);
+
+// Fungsi untuk melakukan normalisasi pada kriteria yang perlu di-maksimumkan (nilai mata pelajaran)
+const normalizeMaximize = (value, max) => value / max;
+
+// Fungsi untuk menghitung skor akhir untuk setiap kandidat
+const calculateScore = (candidate) => {
+  // Normalisasi umur dan jarak
+  const normalizedUmur = normalizeMinimize(candidate.usia, 11, 13);
+  const normalizedJarak = normalizeMinimize(candidate.jarak, 1, 2);
+
+  // Hitung skor akhir
+  const score =
+    weightPKN * normalizeMaximize(candidate.avrg_nilai_pkn, 90) +
+    weightBINDO * normalizeMaximize(candidate.avrg_nilai_bindo, 90) +
+    weightMTK * normalizeMaximize(candidate.avrg_nilai_mtk, 90) +
+    weightIPS * normalizeMaximize(candidate.avrg_nilai_ips, 90) +
+    weightIPA * normalizeMaximize(candidate.avrg_nilai_ipa, 90) +
+    weightDistance * normalizedJarak +
+    weightUsia * normalizedUmur;
+
+  return score;
+};
+
+// Hitung skor akhir untuk setiap kandidat
+const scores = candidates.map((candidate) => ({
+  userId: candidate.userId,
+  nama_lengkap: candidate.nama_lengkap,
+  score: calculateScore(candidate),
+}));
+
+// Urutkan kandidat berdasarkan skor akhir dari yang tertinggi ke terendah
+const sortedCandidates = scores.sort((a, b) => b.score - a.score);
+
+// Tampilkan hasil peringkat
+console.log("Hasil Peringkat:");
+sortedCandidates.forEach((candidate, index) => {
+  console.log(`${index + 1}. ${candidate.nama_lengkap} (Score: ${candidate.score})`);
+});

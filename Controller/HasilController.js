@@ -67,26 +67,43 @@ export const createHasil = async (req, res) => {
       },
       order: [['createdAt', 'DESC']],
     });
+    const rekap_nilai2 = await RekapNilai.findAll();
 
     // Bobot kriteria
+      const bobotUmur = 0.2;
+      const bobotJarak = 0.3;
       const bobotNilaiPkn = 0.1;
       const bobotNilaiBindo = 0.1;
       const bobotNilaiMtk = 0.1;
       const bobotNilaiIps = 0.1;
       const bobotNilaiIpa = 0.1;
-      const bobotJarak = 0.3;
-      const bobotUmur = 0.2;
         
     if (rekap_nilai) {
-      // Normalisasi Kriteria
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - 60) / (100 - 60);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - 60) / (100 - 60);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - 60) / (100 - 60);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - 60) / (100 - 60);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - 60) / (100 - 60);
-      const normalizedDistance = rekap_nilai.jarak / 10;
-      const normalizedUsia = (18 - rekap_nilai.usia) / 18; // Normalisasi usia
+      // mengambil nilai min dan max dari masing masing kriteria
+      const maxUsia = Math.max(...rekap_nilai2.map(rekap => Number(rekap.usia)));
+      const minUsia = Math.min(...rekap_nilai2.map(rekap => Number(rekap.usia)));
+      const maxJarak = Math.max(...rekap_nilai2.map(rekap => Number(rekap.jarak)));
+      const minJarak = Math.min(...rekap_nilai2.map(rekap => Number(rekap.jarak)));
+      const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
+      const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
+      const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
+      const minBindo = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
+      const maxMtk = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
+      const minMtk = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
+      const maxIps = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
+      const minIps = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
+      const maxIpa = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
+      const minIpa = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
 
+      // Normalisasi nilai, umur dan jarak
+      const normalizedUsia = (rekap_nilai.usia - minUsia) / (maxUsia - minUsia);
+      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
+      const normalizedPKN = (maxPkn - rekap_nilai.avrg_nilai_pkn) / (maxPkn - minPkn);
+      const normalizedBINDO = (maxBindo - rekap_nilai.avrg_nilai_bindo) / (maxBindo - minBindo);
+      const normalizedMTK = (maxMtk - rekap_nilai.avrg_nilai_mtk) / (maxMtk - minMtk);
+      const normalizedIPS = (maxIps - rekap_nilai.avrg_nilai_ips) / (maxIps - minIps);
+      const normalizedIPA = (maxIpa - rekap_nilai.avrg_nilai_ipa) / (maxIpa - minIpa);
+      
       // Perhitungsn Skor Akhir
       const skor_akhir =
           bobotNilaiPkn * normalizedPKN +
@@ -94,22 +111,25 @@ export const createHasil = async (req, res) => {
           bobotNilaiMtk * normalizedMTK +
           bobotNilaiIps * normalizedIPS +
           bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedDistance +
+          bobotJarak * normalizedJarak +
           bobotUmur * normalizedUsia;
 
-          // rekap_nilai.sort((a, b) => b.skor_akhir - a.skor_akhir);
-      try {
-        await Hasil.create({
-          userId: req.userId,
-          dataSiswaId: rekap_nilai.dataSiswaId,
-          nama_lengkap: rekap_nilai.nama_lengkap,
-          skor_akhir: skor_akhir,
-          peringkat: 1
-        });
-        res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
-      } catch (error) {
-        res.status(500).json({ msg: error.message });
-      }
+          const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
+          const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
+          console.log(peringkat);
+
+        try {
+          await Hasil.create({
+            userId: req.userId,
+            dataSiswaId: rekap_nilai.dataSiswaId,
+            nama_lengkap: rekap_nilai.nama_lengkap,
+            skor_akhir: skor_akhir,
+            peringkat: peringkat,
+          });
+          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+        } catch (error) {
+          res.status(500).json({ msg: error.message });
+        }
     }else if(!rekap_nilai) {
       return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
     }

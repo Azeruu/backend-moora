@@ -10,7 +10,6 @@ import UserRoute from "./Routes/UserRoutes.js";
 import SiswaRoute from "./Routes/SiswaRoutes.js";
 import AuthRoutes from "./Routes/AuthRoutes.js";
 import JalurRoute from "./Routes/JalurRoutes.js";
-import KriteriaRoute from "./Routes/KriteriaRoutes.js";
 import HasilRoute from "./Routes/HasilRoutes.js";
 import BuktiRoute from "./Routes/BuktiRoutes.js"
 import PingRoutes from "./Routes/PingRoutes.js";
@@ -36,16 +35,16 @@ app.use(session({
     saveUninitialized: true,
     store: store,
     cookie: {
-        secure:true,
-        sameSite: 'None',
+        secure:"auto",
+        // sameSite: 'None',
         httpOnly: true,
         path: '/',
     },
-    proxy:true
+    // proxy:true
 }));
 
 app.use(cors({
-    origin: 'https://frontend.azeru.live',
+    origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Mengizinkan semua metode
     allowedHeaders: 'Content-Type', // Mengizinkan semua header
     credentials: true, // Mengizinkan penggunaan kredensial (cookie)
@@ -56,7 +55,6 @@ app.use(FileUpload());
 app.use(express.static("public"));
 app.use(express.json());
 app.use(JalurRoute);
-app.use(KriteriaRoute);
 app.use(UserRoute);
 app.use(NilaiRoute);
 app.use(HasilRoute);
@@ -66,7 +64,7 @@ app.use(SiswaRoute);
 app.use(AuthRoutes);
 app.use(PingRoutes);
 
- store.sync();
+store.sync();
 
 app.listen(process.env.APP_PORT, () => {
     console.log("Server running on port " + process.env.APP_PORT);
