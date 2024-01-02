@@ -36,21 +36,23 @@ app.use(session({
     saveUninitialized: true,
     store: store,
     cookie: {
-        secure:true,
-        sameSite: 'None',
+        secure:'auto',
+        // sameSite: 'None',
         httpOnly: true,
         path: '/',
     },
-    proxy:true
+    // proxy:true
 }));
 
-app.use(cors({
-    origin: 'https://frontend.azeru.live',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Mengizinkan semua metode
-    allowedHeaders: 'Content-Type', // Mengizinkan semua header
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Mengizinkan semua metode
+    allowedHeaders: "Content-Type", // Mengizinkan semua header
     credentials: true, // Mengizinkan penggunaan kredensial (cookie)
     optionsSuccessStatus: 204,
-}));
+  })
+);
 
 app.use(FileUpload());
 app.use(express.static("public"));
@@ -66,7 +68,7 @@ app.use(SiswaRoute);
 app.use(AuthRoutes);
 app.use(PingRoutes);
 
- store.sync();
+store.sync();
 
 app.listen(process.env.APP_PORT, () => {
     console.log("Server running on port " + process.env.APP_PORT);
