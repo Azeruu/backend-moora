@@ -11,7 +11,7 @@ const dbName = process.env.DB_NAME;
 const dbUrl = `${dbDialect}://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}`;
 
 const db = new Sequelize(dbUrl, {
-    logging: true
+    logging: false
 });
 
 export default db;
