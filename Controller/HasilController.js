@@ -79,6 +79,22 @@ export const createHasil = async (req, res) => {
       const bobotNilaiMtk = 0.1;
       const bobotNilaiIps = 0.1;
       const bobotNilaiIpa = 0.1;
+
+      // Nilai Min dan Max dari Kriteria USIA
+      const upUsia = 13;
+      const downUsia = 11;
+
+      // Nialai Min dan Max dari Rata-rata nilai MAPEL
+      const maxNilaiPKN = 100;
+      const minNilaiPKN = 50;
+      const maxNilaiBINDO = 100;
+      const minNilaiBINDO = 50;
+      const maxNilaiMTK = 100;
+      const minNilaiMTK = 50;
+      const maxNilaiIPS = 100;
+      const minNilaiIPS = 50;
+      const maxNilaiIPA = 100;
+      const minNilaiIPA = 50;
         
     if (rekap_nilai) {
       // mengambil nilai min dan max dari masing masing kriteria
@@ -109,10 +125,10 @@ export const createHasil = async (req, res) => {
       // console.log(normalizedMTK);
       // console.log(normalizedIPS);
       // console.log(normalizedIPS);
-      console.log(rekap_nilai.jarak);
+      // console.log(rekap_nilai.jarak);
+      // console.log(normalizedUsia);
+      // console.log(normalizedJarak);
       
-      console.log(normalizedUsia);
-      console.log(normalizedJarak);
       // Perhitungsn Skor Akhir
       const skor_akhir =
           bobotNilaiPkn * normalizedPKN +
@@ -135,7 +151,7 @@ export const createHasil = async (req, res) => {
             dataSiswaId: rekap_nilai.dataSiswaId,
             nama_lengkap: rekap_nilai.nama_lengkap,
             skor_akhir: skor_akhir,
-            peringkat: peringkat,
+            peringkat: peringkat,//Apakah peringkat harus input dbase? atau cukup di frontend saja?
           });
           res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
         } catch (error) {
