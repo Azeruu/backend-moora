@@ -81,8 +81,10 @@ export const createHasil = async (req, res) => {
       const bobotNilaiIpa = 0.1;
 
       // Nilai Min dan Max dari Kriteria USIA
-      const upUsia = 13;
-      const downUsia = 11;
+      const maxUsia = 13;
+      const minUsia = 11;
+      const maxJarak = 2;
+      const minJarak = 0;
 
       // Nialai Min dan Max dari Rata-rata nilai MAPEL
       const maxNilaiPKN = 100;
@@ -98,36 +100,29 @@ export const createHasil = async (req, res) => {
         
     if (rekap_nilai) {
       // mengambil nilai min dan max dari masing masing kriteria
-      const maxUsia = Math.max(...rekap_nilai2.map(rekap => rekap.usia));
-      const minUsia = Math.min(...rekap_nilai2.map(rekap => rekap.usia));
-      const maxJarak = Math.max(...rekap_nilai2.map(rekap => rekap.jarak));
-      const minJarak = Math.min(...rekap_nilai2.map(rekap => rekap.jarak));
-      const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      const minBindo = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      const maxMtk = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      const minMtk = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      const maxIps = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      const minIps = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      const maxIpa = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
-      const minIpa = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
+      // const maxUsia = Math.max(...rekap_nilai2.map(rekap => rekap.usia));
+      // const minUsia = Math.min(...rekap_nilai2.map(rekap => rekap.usia));
+      // const maxJarak = Math.max(...rekap_nilai2.map(rekap => rekap.jarak));
+      // const minJarak = Math.min(...rekap_nilai2.map(rekap => rekap.jarak));
+      // const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
+      // const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
+      // const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
+      // const minBindo = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
+      // const maxMtk = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
+      // const minMtk = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
+      // const maxIps = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
+      // const minIps = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
+      // const maxIpa = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
+      // const minIpa = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
 
       // Normalisasi nilai, umur dan jarak
       const normalizedUsia = (rekap_nilai.usia - minUsia) / (maxUsia - minUsia);
       const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (maxPkn - rekap_nilai.avrg_nilai_pkn) / (maxPkn - minPkn);
-      const normalizedBINDO = (maxBindo - rekap_nilai.avrg_nilai_bindo) / (maxBindo - minBindo);
-      const normalizedMTK = (maxMtk - rekap_nilai.avrg_nilai_mtk) / (maxMtk - minMtk);
-      const normalizedIPS = (maxIps - rekap_nilai.avrg_nilai_ips) / (maxIps - minIps);
-      const normalizedIPA = (maxIpa - rekap_nilai.avrg_nilai_ipa) / (maxIpa - minIpa);
-      // console.log(normalizedPKN);
-      // console.log(normalizedMTK);
-      // console.log(normalizedIPS);
-      // console.log(normalizedIPS);
-      // console.log(rekap_nilai.jarak);
-      // console.log(normalizedUsia);
-      // console.log(normalizedJarak);
+      const normalizedPKN = (maxNilaiPKN - rekap_nilai.avrg_nilai_pkn) / (maxNilaiPKN - minNilaiPKN);
+      const normalizedBINDO = (maxNilaiBINDO - rekap_nilai.avrg_nilai_bindo) / (maxNilaiBINDO - minNilaiBINDO);
+      const normalizedMTK = (maxNilaiMTK - rekap_nilai.avrg_nilai_mtk) / (maxNilaiMTK - minNilaiMTK);
+      const normalizedIPS = (maxNilaiIPS - rekap_nilai.avrg_nilai_ips) / (maxNilaiIPS - minNilaiIPS);
+      const normalizedIPA = (maxNilaiIPA - rekap_nilai.avrg_nilai_ipa) / (maxNilaiIPA - minNilaiIPA);
       
       // Perhitungsn Skor Akhir
       const skor_akhir =
@@ -139,9 +134,9 @@ export const createHasil = async (req, res) => {
           bobotJarak * normalizedJarak +
           bobotUmur * normalizedUsia;
 
-          const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
+          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
           // console.log(sortedRekapNilai);
-          const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
+          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
           // console.log(peringkat);
           // console.log(skor_akhir);
 
@@ -151,7 +146,6 @@ export const createHasil = async (req, res) => {
             dataSiswaId: rekap_nilai.dataSiswaId,
             nama_lengkap: rekap_nilai.nama_lengkap,
             skor_akhir: skor_akhir,
-            peringkat: peringkat,//Apakah peringkat harus input dbase? atau cukup di frontend saja?
           });
           res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
         } catch (error) {

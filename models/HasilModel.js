@@ -36,13 +36,6 @@ const Hasil = db.define(
         notEmpty: true,
       },
     },
-    peringkat: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
   },
   {
     freezeTableName: true,
