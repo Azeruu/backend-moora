@@ -61,7 +61,7 @@ const Siswa = db.define(
       },
     },
     usia: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: true,

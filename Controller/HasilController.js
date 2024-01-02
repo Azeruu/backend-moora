@@ -59,6 +59,8 @@ export const getHasilById = async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 };
+
+// CREATE HASIL
 export const createHasil = async (req, res) => {
   try {
     const rekap_nilai = await RekapNilai.findOne({
@@ -80,10 +82,10 @@ export const createHasil = async (req, res) => {
         
     if (rekap_nilai) {
       // mengambil nilai min dan max dari masing masing kriteria
-      const maxUsia = Math.max(...rekap_nilai2.map(rekap => Number(rekap.usia)));
-      const minUsia = Math.min(...rekap_nilai2.map(rekap => Number(rekap.usia)));
-      const maxJarak = Math.max(...rekap_nilai2.map(rekap => Number(rekap.jarak)));
-      const minJarak = Math.min(...rekap_nilai2.map(rekap => Number(rekap.jarak)));
+      const maxUsia = Math.max(...rekap_nilai2.map(rekap => rekap.usia));
+      const minUsia = Math.min(...rekap_nilai2.map(rekap => rekap.usia));
+      const maxJarak = Math.max(...rekap_nilai2.map(rekap => rekap.jarak));
+      const minJarak = Math.min(...rekap_nilai2.map(rekap => rekap.jarak));
       const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
       const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
       const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
@@ -103,7 +105,14 @@ export const createHasil = async (req, res) => {
       const normalizedMTK = (maxMtk - rekap_nilai.avrg_nilai_mtk) / (maxMtk - minMtk);
       const normalizedIPS = (maxIps - rekap_nilai.avrg_nilai_ips) / (maxIps - minIps);
       const normalizedIPA = (maxIpa - rekap_nilai.avrg_nilai_ipa) / (maxIpa - minIpa);
+      // console.log(normalizedPKN);
+      // console.log(normalizedMTK);
+      // console.log(normalizedIPS);
+      // console.log(normalizedIPS);
+      console.log(rekap_nilai.jarak);
       
+      console.log(normalizedUsia);
+      console.log(normalizedJarak);
       // Perhitungsn Skor Akhir
       const skor_akhir =
           bobotNilaiPkn * normalizedPKN +
@@ -115,8 +124,10 @@ export const createHasil = async (req, res) => {
           bobotUmur * normalizedUsia;
 
           const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
+          // console.log(sortedRekapNilai);
           const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
-          console.log(peringkat);
+          // console.log(peringkat);
+          // console.log(skor_akhir);
 
         try {
           await Hasil.create({
