@@ -99,30 +99,15 @@ export const createHasil = async (req, res) => {
       const minNilaiIPA = 50;
         
     if (rekap_nilai) {
-      // mengambil nilai min dan max dari masing masing kriteria
-      // const maxUsia = Math.max(...rekap_nilai2.map(rekap => rekap.usia));
-      // const minUsia = Math.min(...rekap_nilai2.map(rekap => rekap.usia));
-      // const maxJarak = Math.max(...rekap_nilai2.map(rekap => rekap.jarak));
-      // const minJarak = Math.min(...rekap_nilai2.map(rekap => rekap.jarak));
-      // const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      // const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      // const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      // const minBindo = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      // const maxMtk = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      // const minMtk = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      // const maxIps = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      // const minIps = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      // const maxIpa = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
-      // const minIpa = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
 
       // Normalisasi nilai, umur dan jarak
-      const normalizedUsia = (rekap_nilai.usia - minUsia) / (maxUsia - minUsia);
+      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
       const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (maxNilaiPKN - rekap_nilai.avrg_nilai_pkn) / (maxNilaiPKN - minNilaiPKN);
-      const normalizedBINDO = (maxNilaiBINDO - rekap_nilai.avrg_nilai_bindo) / (maxNilaiBINDO - minNilaiBINDO);
-      const normalizedMTK = (maxNilaiMTK - rekap_nilai.avrg_nilai_mtk) / (maxNilaiMTK - minNilaiMTK);
-      const normalizedIPS = (maxNilaiIPS - rekap_nilai.avrg_nilai_ips) / (maxNilaiIPS - minNilaiIPS);
-      const normalizedIPA = (maxNilaiIPA - rekap_nilai.avrg_nilai_ipa) / (maxNilaiIPA - minNilaiIPA);
+      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
+      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
+      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
+      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
+      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
       
       // Perhitungsn Skor Akhir
       const skor_akhir =
@@ -169,25 +154,44 @@ export const updateHasil = async (req, res) => {
       },
     });
 
-    // Bobot kriteria
+   // Bobot kriteria
+      const bobotUmur = 0.2;
+      const bobotJarak = 0.3;
       const bobotNilaiPkn = 0.1;
       const bobotNilaiBindo = 0.1;
       const bobotNilaiMtk = 0.1;
       const bobotNilaiIps = 0.1;
       const bobotNilaiIpa = 0.1;
-      const bobotJarak = 0.3;
-      const bobotUmur = 0.2;
+
+      // Nilai Min dan Max dari Kriteria USIA
+      const maxUsia = 13;
+      const minUsia = 11;
+      const maxJarak = 2;
+      const minJarak = 0;
+
+      // Nialai Min dan Max dari Rata-rata nilai MAPEL
+      const maxNilaiPKN = 100;
+      const minNilaiPKN = 50;
+      const maxNilaiBINDO = 100;
+      const minNilaiBINDO = 50;
+      const maxNilaiMTK = 100;
+      const minNilaiMTK = 50;
+      const maxNilaiIPS = 100;
+      const minNilaiIPS = 50;
+      const maxNilaiIPA = 100;
+      const minNilaiIPA = 50;
         
     if (rekap_nilai) {
-      // Normalisasi Kriteria
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - 60) / (100 - 60);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - 60) / (100 - 60);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - 60) / (100 - 60);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - 60) / (100 - 60);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - 60) / (100 - 60);
-      const normalizedDistance = rekap_nilai.jarak / 10;
-      const normalizedUsia = (18 - rekap_nilai.usia) / 18; // Normalisasi usia
 
+      // Normalisasi nilai, umur dan jarak
+      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
+      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
+      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
+      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
+      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
+      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
+      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
+      
       // Perhitungsn Skor Akhir
       const skor_akhir =
           bobotNilaiPkn * normalizedPKN +
@@ -195,26 +199,29 @@ export const updateHasil = async (req, res) => {
           bobotNilaiMtk * normalizedMTK +
           bobotNilaiIps * normalizedIPS +
           bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedDistance +
+          bobotJarak * normalizedJarak +
           bobotUmur * normalizedUsia;
 
-          // rekap_nilai.sort((a, b) => b.skor_akhir - a.skor_akhir);
-      try {
-        await Hasil.update({
-          userId: req.userId,
-          dataSiswaId: rekap_nilai.dataSiswaId,
-          nama_lengkap: rekap_nilai.nama_lengkap,
-          skor_akhir: skor_akhir,
-          peringkat: 1
-        },{
-          where: {
+          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
+          // console.log(sortedRekapNilai);
+          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
+          // console.log(peringkat);
+          // console.log(skor_akhir);
+
+        try {
+          await Hasil.update({
+            userId: req.userId,
             dataSiswaId: rekap_nilai.dataSiswaId,
-          },
-        });
-        res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
-      } catch (error) {
-        res.status(500).json({ msg: error.message });
-      }
+            nama_lengkap: rekap_nilai.nama_lengkap,
+            skor_akhir: skor_akhir,
+          },{
+            where:{
+              dataSiswaId:rekap_nilai.dataSiswaId;
+          });
+          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+        } catch (error) {
+          res.status(500).json({ msg: error.message });
+        }
     }else if(!rekap_nilai) {
       return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
     }
