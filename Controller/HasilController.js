@@ -20,6 +20,7 @@ export const getHasil = async (req, res) => {
   }
 };
 
+
 //get Hasil By ID
 export const getHasilById = async (req, res) => {
   try {
@@ -65,7 +66,7 @@ export const createHasil = async (req, res) => {
   try {
     const rekap_nilai = await RekapNilai.findOne({
       where: {
-        userId: req.userId, // Mencocokkan userId dengan req.userId
+        userId: req.userId, // Mencocokkan userId dengan req.userId 
       },
       order: [['createdAt', 'DESC']],
     });
@@ -99,21 +100,6 @@ export const createHasil = async (req, res) => {
       const minNilaiIPA = 50;
         
     if (rekap_nilai) {
-      // mengambil nilai min dan max dari masing masing kriteria
-      // const maxUsia = Math.max(...rekap_nilai2.map(rekap => rekap.usia));
-      // const minUsia = Math.min(...rekap_nilai2.map(rekap => rekap.usia));
-      // const maxJarak = Math.max(...rekap_nilai2.map(rekap => rekap.jarak));
-      // const minJarak = Math.min(...rekap_nilai2.map(rekap => rekap.jarak));
-      // const maxPkn = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      // const minPkn = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_pkn)));
-      // const maxBindo = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      // const minBindo = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_bindo)));
-      // const maxMtk = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      // const minMtk = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_mtk)));
-      // const maxIps = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      // const minIps = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ips)));
-      // const maxIpa = Math.max(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
-      // const minIpa = Math.min(...rekap_nilai2.map(rekap => Number(rekap.avrg_nilai_ipa)));
 
       // Normalisasi nilai, umur dan jarak
       const normalizedUsia = (rekap_nilai.usia - minUsia) / (maxUsia - minUsia);
@@ -155,6 +141,7 @@ export const createHasil = async (req, res) => {
       return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ msg: error.message });
   }
 };
