@@ -261,7 +261,7 @@ export const deleteNilai = async (req, res) => {
   try {
     const nilai = await RekapNilai.findOne({
       where: {
-        userId:req.userId
+        dataSiswaId:req.params.id
       },
     });
     if (!nilai) return res.status(404).json({ msg: "Data tidak ditemukan" });

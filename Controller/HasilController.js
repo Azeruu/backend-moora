@@ -218,8 +218,8 @@ export const updateHasil = async (req, res) => {
             skor_akhir: skor_akhir,
           },{
             where:{
-              dataSiswaId:rekap_nilai.dataSiswaId;
-          });
+              dataSiswaId:rekap_nilai.dataSiswaId
+          }});
           res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
         } catch (error) {
           res.status(500).json({ msg: error.message });
@@ -237,10 +237,10 @@ export const deleteHasil = async (req, res) => {
   try {
     const hasil = await Hasil.findOne({
       where: {
-        userId:req.userId
+        dataSiswaId:req.params.id
       },
     });
-    if (!hasil) return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (!hasil) return res.status(404).json({ msg: "Data hasil tidak ditemukan" });
     if (req.role === "admin") {
       await Hasil.destroy({
         where: {

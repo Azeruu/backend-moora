@@ -233,20 +233,9 @@ export const updateNilai = async (req, res) => {
 //HAPUS Nilai
 export const deleteNilai = async (req, res) => {
   try {
-    const dataSiswaId = await Siswa.findOne({
-      where: {
-        userId: req.userId,
-      },
-    });
-
-    if (!dataSiswaId) {
-      return res.status(404).json({ msg: "Data Siswa tidak ditemukan" });
-    }
-
-    // Cari data nilai berdasarkan dataSiswaId
     const nilai = await Nilai.findOne({
       where: {
-        dataSiswaId: dataSiswaId.id,
+        dataSiswaId: req.params.id,
       },
     });
 
