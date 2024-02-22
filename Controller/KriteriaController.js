@@ -1,6 +1,6 @@
-import Nilai from "../models/NilaiModel.js";
-import User from "../models/UserModel.js";
-import Siswa from "../models/SiswaModel.js";
+// import Nilai from "../models/NilaiModel.js";
+// import User from "../models/UserModel.js";
+// import Siswa from "../models/SiswaModel.js";
 import { Op } from "sequelize";
 
 //get Nilai

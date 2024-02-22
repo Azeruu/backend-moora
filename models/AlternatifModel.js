@@ -3,9 +3,16 @@ import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
 
-const HasilModel = db.define(
-  "hasil",
+const AlternatifModel = db.define(
+  "data_alternatif",
   {
+    kode_alternatif: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
     nama_alternatif: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -13,13 +20,7 @@ const HasilModel = db.define(
         notEmpty: true,
       },
     },
-    nilai: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
+    
   },
   {
     freezeTableName: true,
@@ -30,4 +31,5 @@ const HasilModel = db.define(
 //   await db.sync();
 // })();
 
-export default HasilModel;
+
+export default AlternatifModel;

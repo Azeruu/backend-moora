@@ -35,7 +35,7 @@ app.use(session({
     saveUninitialized: true,
     store: store,
     cookie: {
-        secure: true,
+        secure: 'auto',
         sameSite: 'None',
         httpOnly: true,
         path: '/',
@@ -44,7 +44,7 @@ app.use(session({
 }));
 
 app.use(cors({
-    origin: 'https://frontend.azeru.live',
+    origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Mengizinkan semua metode
     allowedHeaders: 'Content-Type', // Mengizinkan semua header
     credentials: true, // Mengizinkan penggunaan kredensial (cookie)

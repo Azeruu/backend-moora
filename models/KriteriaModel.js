@@ -3,23 +3,31 @@ import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
 
-const HasilModel = db.define(
-  "hasil",
+const KriteriaModel = db.define(
+  "data_kriteria",
   {
-    nama_alternatif: {
+    kode_kriteria: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    nilai: {
+    nama_kriteria: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    bobot_kriteria: {
       type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
+    
   },
   {
     freezeTableName: true,
@@ -27,7 +35,7 @@ const HasilModel = db.define(
 );
 
 // (async()=>{
-//   await db.sync();
+//   await db.sync({alter:true});
 // })();
 
-export default HasilModel;
+export default KriteriaModel;

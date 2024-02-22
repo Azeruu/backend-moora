@@ -1,15 +1,13 @@
 import { Sequelize } from "sequelize";
-import User from "./UserModel.js";
 import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
 
-const Jalur = db.define(
+const JalurModel = db.define(
   "jalur",
   {
-    uuid: {
+    kode_jalur: {
       type: DataTypes.STRING,
-      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -32,4 +30,4 @@ const Jalur = db.define(
 //   await db.sync();
 // })();
 
-export default Jalur;
+export default JalurModel;

@@ -1,5 +1,5 @@
 import Jalur from "../models/JalurModel.js";
-import User from "../models/UserModel.js";
+// import User from "../models/UserModel.js";
 import { Op } from "sequelize";
 
 //get Jalur

@@ -1,16 +1,17 @@
-import Hasil from "../models/HasilModel.js";
-import User from "../models/UserModel.js";
-import RekapNilai from "../models/RekapNilaiModel.js";
-import { Op } from "sequelize";
+// import RekapNilai from "../models/RekapNilaiModel.js";
+// import Nilai from "../models/NilaiModel.js";
+// import Siswa from "../models/SiswaModel.js";
+// import User from "../models/UserModel.js";
+import { Op, Sequelize } from "sequelize";
 
-//get Hasil
-export const getHasil = async (req, res) => {
+//get RekapNilai
+export const getNilai = async (req, res) => {
   try {
-    const response = await Hasil.findAll({
+    const response = await RekapNilai.findAll({
       include: [
         {
           model: User,
-          attributes: ["username", "password"],
+          atributes: ["username", "password"],
         },
       ],
     });
@@ -20,21 +21,20 @@ export const getHasil = async (req, res) => {
   }
 };
 
-
-//get Hasil By ID
-export const getHasilById = async (req, res) => {
+//get RekapNilai By ID
+export const getNilaiById = async (req, res) => {
   try {
-    const hasil = await Hasil.findOne({
+    const nilai = await RekapNilai.findOne({
       where: [
         {
           uuid: req.params.id,
         },
       ],
     });
-    if (!hasil) return res.status(404).json({ msg: "Data Tidak Diteukan" });
+    if (!nilai) return res.status(404).json({ msg: "Data Tidak Diteukan" });
     let response;
     if (req.role === "admin") {
-      response = await Hasil.findOne({
+      response = await RekapNilai.findOne({
         include: [
           {
             model: User,
@@ -43,9 +43,9 @@ export const getHasilById = async (req, res) => {
         ],
       });
     } else {
-      response = await Hasil.findOne({
+      response = await RekapNilai.findOne({
         where: {
-          [Op.and]: [{ id: hasil.id }, { userId: req.userId }],
+          [Op.and]: [{ id: nilai.id }, { userId: req.userId }],
         },
         include: [
           {
@@ -60,199 +60,223 @@ export const getHasilById = async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 };
+// CREATE DATA REKAP NILAI
+export const createRekap = async (req, res) => {
+  const dataSiswaId = await Siswa.findOne({
+    where: {
+      userId: req.userId, // Mencocokkan userId dengan req.userId
+    },
+    order: [['createdAt', 'DESC']],
+  });
 
-// CREATE HASIL
-export const createHasil = async (req, res) => {
-  try {
-    const rekap_nilai = await RekapNilai.findOne({
+  if (!dataSiswaId) {
+    return res.status(404).json({ msg: "Data Siswa tidak ditemukan" });
+  }
+  try{
+    const avrg_nilai = await Nilai.findOne({
+      attributes: [
+        "pkn1",
+        "pkn2",
+        "pkn3",
+        "pkn4",
+        "pkn5",
+        "bindo1",
+        "bindo2",
+        "bindo3",
+        "bindo4",
+        "bindo5",
+        "mtk1",
+        "mtk2",
+        "mtk3",
+        "mtk4",
+        "mtk5",
+        "ips1",
+        "ips2",
+        "ips3",
+        "ips4",
+        "ips5",
+        "ipa1",
+        "ipa2",
+        "ipa3",
+        "ipa4",
+        "ipa5",
+      ],
       where: {
-        userId: req.userId, // Mencocokkan userId dengan req.userId 
+        dataSiswaId: dataSiswaId.id, // Mencocokkan userId dengan req.userId
       },
-      order: [['createdAt', 'DESC']],
     });
-    const rekap_nilai2 = await RekapNilai.findAll();
+    if(avrg_nilai){
+      const total_pkn = (
+        avrg_nilai.pkn1 + avrg_nilai.pkn2 + avrg_nilai.pkn3 + avrg_nilai.pkn4 + avrg_nilai.pkn5
+        );
+      const total_bindo = (
+        avrg_nilai.bindo1 + avrg_nilai.bindo2 + avrg_nilai.bindo3 + avrg_nilai.bindo4 + avrg_nilai.bindo5
+        );
+      const total_mtk = (
+        avrg_nilai.mtk1 + avrg_nilai.mtk2 + avrg_nilai.mtk3 + avrg_nilai.mtk4 + avrg_nilai.mtk5
+        );
+      const total_ips = (
+        avrg_nilai.ips1 + avrg_nilai.ips2 + avrg_nilai.ips3 + avrg_nilai.ips4 + avrg_nilai.ips5
+        );
+      const total_ipa = (
+        avrg_nilai.ipa1 + avrg_nilai.ipa2 + avrg_nilai.ipa3 + avrg_nilai.ipa4 + avrg_nilai.ipa5
+        );
 
-    // Bobot kriteria
-      const bobotUmur = 0.2;
-      const bobotJarak = 0.3;
-      const bobotNilaiPkn = 0.1;
-      const bobotNilaiBindo = 0.1;
-      const bobotNilaiMtk = 0.1;
-      const bobotNilaiIps = 0.1;
-      const bobotNilaiIpa = 0.1;
-
-      // Nilai Min dan Max dari Kriteria USIA
-      const maxUsia = 13;
-      const minUsia = 11;
-      const maxJarak = 2;
-      const minJarak = 0;
-
-      // Nialai Min dan Max dari Rata-rata nilai MAPEL
-      const maxNilaiPKN = 100;
-      const minNilaiPKN = 50;
-      const maxNilaiBINDO = 100;
-      const minNilaiBINDO = 50;
-      const maxNilaiMTK = 100;
-      const minNilaiMTK = 50;
-      const maxNilaiIPS = 100;
-      const minNilaiIPS = 50;
-      const maxNilaiIPA = 100;
-      const minNilaiIPA = 50;
-        
-    if (rekap_nilai) {
-
-      // Normalisasi nilai, umur dan jarak
-      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
-      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
-      
-      // Perhitungsn Skor Akhir
-      const skor_akhir =
-          bobotNilaiPkn * normalizedPKN +
-          bobotNilaiBindo * normalizedBINDO +
-          bobotNilaiMtk * normalizedMTK +
-          bobotNilaiIps * normalizedIPS +
-          bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedJarak +
-          bobotUmur * normalizedUsia;
-
-          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
-          // console.log(sortedRekapNilai);
-          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
-          // console.log(peringkat);
-          // console.log(skor_akhir);
+        // Menghitung rata-rata
+        const avrg_nilai_pkn = total_pkn / 5;
+        const avrg_nilai_bindo = total_bindo / 5;
+        const avrg_nilai_mtk = total_mtk / 5;
+        const avrg_nilai_ips = total_ips / 5;
+        const avrg_nilai_ipa = total_ipa / 5;
 
         try {
-          await Hasil.create({
+          await RekapNilai.create({
             userId: req.userId,
-            dataSiswaId: rekap_nilai.dataSiswaId,
-            nama_lengkap: rekap_nilai.nama_lengkap,
-            skor_akhir: skor_akhir,
+            dataSiswaId: dataSiswaId.id,
+            nama_lengkap: dataSiswaId.nama_lengkap,
+            avrg_nilai_pkn: avrg_nilai_pkn,
+            avrg_nilai_bindo: avrg_nilai_bindo,
+            avrg_nilai_mtk: avrg_nilai_mtk,
+            avrg_nilai_ips: avrg_nilai_ips,
+            avrg_nilai_ipa: avrg_nilai_ipa,
+            jarak: dataSiswaId.jarak,
+            usia: dataSiswaId.usia,
           });
-          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+          res.status(201).json({ msg: "Data rekap Berhasil Diinput" });
         } catch (error) {
           res.status(500).json({ msg: error.message });
         }
-    }else if(!rekap_nilai) {
-      return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
+    }else {
+      console.log("Data nilai tidak ditemukan.");
+      res.status(404).json({ msg: "Data nilai tidak ditemukan." });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({ msg: error.message });
   }
 };
 
-//UPDATE Hasil
-export const updateHasil = async (req, res) => {
-  try {
-    const rekap_nilai = await RekapNilai.findOne({
+//UPDATE RekapNilai
+export const updateNilai = async (req, res) => {
+  const dataSiswaId = await Siswa.findOne({
+    where: {
+      id:req.params.id // Mencocokkan userId dengan req.userId
+    },
+  });
+
+  if (!dataSiswaId) {
+    return res.status(404).json({ msg: "Data Siswa tidak ditemukan" });
+  }
+  try{
+    const avrg_nilai = await Nilai.findOne({
+      attributes: [
+        "pkn1",
+        "pkn2",
+        "pkn3",
+        "pkn4",
+        "pkn5",
+        "bindo1",
+        "bindo2",
+        "bindo3",
+        "bindo4",
+        "bindo5",
+        "mtk1",
+        "mtk2",
+        "mtk3",
+        "mtk4",
+        "mtk5",
+        "ips1",
+        "ips2",
+        "ips3",
+        "ips4",
+        "ips5",
+        "ipa1",
+        "ipa2",
+        "ipa3",
+        "ipa4",
+        "ipa5",
+      ],
       where: {
-        userId: req.userId,
-        dataSiswaId:req.params.id 
+        dataSiswaId: dataSiswaId.id, // Mencocokkan userId dengan req.userId
       },
     });
+    if(avrg_nilai){
+      const total_pkn = (
+        avrg_nilai.pkn1 + avrg_nilai.pkn2 + avrg_nilai.pkn3 + avrg_nilai.pkn4 + avrg_nilai.pkn5
+        );
+      const total_bindo = (
+        avrg_nilai.bindo1 + avrg_nilai.bindo2 + avrg_nilai.bindo3 + avrg_nilai.bindo4 + avrg_nilai.bindo5
+        );
+      const total_mtk = (
+        avrg_nilai.mtk1 + avrg_nilai.mtk2 + avrg_nilai.mtk3 + avrg_nilai.mtk4 + avrg_nilai.mtk5
+        );
+      const total_ips = (
+        avrg_nilai.ips1 + avrg_nilai.ips2 + avrg_nilai.ips3 + avrg_nilai.ips4 + avrg_nilai.ips5
+        );
+      const total_ipa = (
+        avrg_nilai.ipa1 + avrg_nilai.ipa2 + avrg_nilai.ipa3 + avrg_nilai.ipa4 + avrg_nilai.ipa5
+        );
 
-   // Bobot kriteria
-      const bobotUmur = 0.2;
-      const bobotJarak = 0.3;
-      const bobotNilaiPkn = 0.1;
-      const bobotNilaiBindo = 0.1;
-      const bobotNilaiMtk = 0.1;
-      const bobotNilaiIps = 0.1;
-      const bobotNilaiIpa = 0.1;
-
-      // Nilai Min dan Max dari Kriteria USIA
-      const maxUsia = 13;
-      const minUsia = 11;
-      const maxJarak = 2;
-      const minJarak = 0;
-
-      // Nialai Min dan Max dari Rata-rata nilai MAPEL
-      const maxNilaiPKN = 100;
-      const minNilaiPKN = 50;
-      const maxNilaiBINDO = 100;
-      const minNilaiBINDO = 50;
-      const maxNilaiMTK = 100;
-      const minNilaiMTK = 50;
-      const maxNilaiIPS = 100;
-      const minNilaiIPS = 50;
-      const maxNilaiIPA = 100;
-      const minNilaiIPA = 50;
-        
-    if (rekap_nilai) {
-
-      // Normalisasi nilai, umur dan jarak
-      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
-      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
-      
-      // Perhitungsn Skor Akhir
-      const skor_akhir =
-          bobotNilaiPkn * normalizedPKN +
-          bobotNilaiBindo * normalizedBINDO +
-          bobotNilaiMtk * normalizedMTK +
-          bobotNilaiIps * normalizedIPS +
-          bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedJarak +
-          bobotUmur * normalizedUsia;
-
-          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
-          // console.log(sortedRekapNilai);
-          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
-          // console.log(peringkat);
-          // console.log(skor_akhir);
+        // Menghitung rata-rata
+        const avrg_nilai_pkn = total_pkn / 5;
+        const avrg_nilai_bindo = total_bindo / 5;
+        const avrg_nilai_mtk = total_mtk / 5;
+        const avrg_nilai_ips = total_ips / 5;
+        const avrg_nilai_ipa = total_ipa / 5;
 
         try {
-          await Hasil.update({
-            userId: req.userId,
-            dataSiswaId: rekap_nilai.dataSiswaId,
-            nama_lengkap: rekap_nilai.nama_lengkap,
-            skor_akhir: skor_akhir,
-          },{
-            where:{
-              dataSiswaId:rekap_nilai.dataSiswaId
-          }});
-          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+          await RekapNilai.update(
+            {
+              userId: req.userId,
+              dataSiswaId: dataSiswaId.id,
+              nama_lengkap: dataSiswaId.nama_lengkap,
+              avrg_nilai_pkn: avrg_nilai_pkn,
+              avrg_nilai_bindo: avrg_nilai_bindo,
+              avrg_nilai_mtk: avrg_nilai_mtk,
+              avrg_nilai_ips: avrg_nilai_ips,
+              avrg_nilai_ipa: avrg_nilai_ipa,
+              jarak: dataSiswaId.jarak,
+              usia: dataSiswaId.usia,
+            },
+            {
+              where: {
+                dataSiswaId: dataSiswaId.id,
+              },
+            }
+          );
+          res.status(201).json({ msg: "Data rekap Berhasil Diinput" });
         } catch (error) {
           res.status(500).json({ msg: error.message });
         }
-    }else if(!rekap_nilai) {
-      return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
+    }else {
+      console.log("Data nilai tidak ditemukan.");
+      res.status(404).json({ msg: "Data nilai tidak ditemukan." });
     }
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
 
-//HAPUS Hasil
-export const deleteHasil = async (req, res) => {
+//HAPUS RekapNilai
+export const deleteNilai = async (req, res) => {
   try {
-    const hasil = await Hasil.findOne({
+    const nilai = await RekapNilai.findOne({
       where: {
         dataSiswaId:req.params.id
       },
     });
-    if (!hasil) return res.status(404).json({ msg: "Data hasil tidak ditemukan" });
+    if (!nilai) return res.status(404).json({ msg: "Data tidak ditemukan" });
     if (req.role === "admin") {
-      await Hasil.destroy({
+      await RekapNilai.destroy({
         where: {
-          id: hasil.id,
+          id: nilai.id,
         },
       });
     } else {
-      if (req.userId !== hasil.userId)
+      if (req.userId !== nilai.userId)
         return res.status(403).json({ msg: "Anda tidak memiliki akses" });
-      await Hasil.destroy({
+      await RekapNilai.destroy({
         where: {
-          [Op.and]: [{ id: hasil.id }, { userId: req.userId }],
+          [Op.and]: [{ id: nilai.id }, { userId: req.userId }],
         },
       });
     }

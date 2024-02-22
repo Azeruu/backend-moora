@@ -1,0 +1,201 @@
+import Alternatif from "../models/AlternatifModel.js";
+import User from "../models/UserModel.js";
+import { Op } from "sequelize";
+
+//GET SISWA
+export const getAlternatif = async (req, res) => {
+  try {
+    let response;
+    if(req.role === "admin") {
+      response = await Alternatif.findAll({
+        attributes: [
+          "id",
+          "kode_alternatif",
+          "nama_alernatif",
+        ],
+        include: [
+          {
+            model: User,
+            attributes: ["id","username", "email"],
+          },
+        ],
+      });
+    }else{
+      response = await Alternatif.findAll({
+        attributes: [
+          "id",
+          "kode_alternatif",
+          "nama_alernatif",
+        ],
+        // Menggunakan Where agar user hanya bisa melihat data yang ia input saja
+        where: {
+          userId: req.userId,
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id","username", "email"],
+          },
+        ],
+      });
+    }
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+//GET SISWA BY ID
+export const getAlternatifById = async (req, res) => {
+  try {
+    const alt = await Alternatif.findOne({
+      where:{
+        id: req.params.id
+      }
+    });
+    if(!alt) return res.status(404).json({msg : 'Data tidak ditemukan'});
+    let response;
+    if(req.role === "admin") {
+      response = await Alternatif.findOne({
+        attributes: [
+          "id",
+          "kode_alternatif",
+          "nama_alernatif",
+        ],
+        where: {
+          userId: alt.userId,
+          id:alt.id
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id","username", "email"],
+          },
+        ],
+      });
+    }else{
+      response = await Alternatif.findOne({
+        attributes: [
+          "id",
+          "kode_alternatif",
+          "nama_alernatif",
+        ],
+        where: {
+          [Op.and]: [{ id: alt.id }, { userId: req.userId }],
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id","username", "email"],
+          },
+        ],
+      });
+    }
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+//CREATE Alternatif
+export const createAlternatif = async (req, res, next) => {
+    if (req.role !== "admin") {
+      const AlternatifExist = await Alternatif.findOne({
+        where: {
+          userId:req.userId
+        }
+      });
+    
+      if (AlternatifExist) {
+        return res.status(400).json({ msg: "Anda sudah melakukan input, Tidak dapat melakukan input data lebih dari 1 kali" });
+      }
+    }
+  const {
+    kode_alternatif,
+    nama_alernatif
+  } = req.body;
+  try {
+    const AlternatifBaru = await Alternatif.create({
+      kode_alternatif:kode_alternatif,
+      nama_alernatif:nama_alernatif
+    });
+    res.status(201).json({msg : 'Data Alternatif Berhasil Diinput'});
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+//UPDATE ALTERNATIF
+export const updateAlternatif = async (req, res) => {
+  try {
+    const alt = await Alternatif.findOne({
+      where:{
+        id: req.params.id
+      }
+    });
+    if(!alt) return res.status(404).json({msg : 'Data tidak ditemukan'});
+    const {
+        kode_alternatif,
+        nama_alernatif
+    } = req.body;
+    if(req.role === "admin") {
+      await Alternatif.update(
+        {
+        kode_alternatif,
+        nama_alernatif
+        },
+        {
+          where: {
+            id: alt.id,
+          },
+        }
+      );
+    }else{
+      if(req.userId !== alt.userId) return res.status(403).json({msg : 'Anda tidak memiliki akses'});
+      await Alternatif.update(
+        {
+          kode_alternatif,
+          nama_alernatif
+        },
+        {
+          where: {
+            [Op.and]: [{ id: alt.id }, { userId: req.userId }],
+          },
+        }
+      );
+    }
+    res.status(200).json({msg : "Data Alternatif Berhasil Diupdate"});
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+//HAPUS SISWA
+export const deleteAlternatif = async (req, res) => {
+  try {
+    const alt = await Alternatif.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if(!alt) return res.status(404).json({msg : 'Data tidak ditemukan'});
+
+    if(req.role === "admin") {
+      await Alternatif.destroy({
+        where:{
+          id:alt.id
+        }
+      });
+    }else{
+      if(req.userId !== alt.userId) return res.status(403).json({msg : 'Anda tidak memiliki akses'});
+      await Alternatif.destroy({
+        where:{
+          [Op.and]: [{ id: alt.id }, { userId: req.userId }],
+        }
+      });
+    }
+    res.status(200).json({msg : "Data Alternatif Berhasil Dihapus"});
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
