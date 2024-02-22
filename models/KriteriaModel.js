@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import Alternatif from "../models/AlternatifModel.js";
 import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
@@ -37,5 +38,6 @@ const KriteriaModel = db.define(
 // (async()=>{
 //   await db.sync({alter:true});
 // })();
+Alternatif.hasMany(KriteriaModel);
 
 export default KriteriaModel;

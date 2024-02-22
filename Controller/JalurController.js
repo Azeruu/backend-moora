@@ -1,5 +1,5 @@
 import Jalur from "../models/JalurModel.js";
-// import User from "../models/UserModel.js";
+import User from "../models/UserModel.js";
 import { Op } from "sequelize";
 
 //get Jalur
@@ -90,7 +90,6 @@ export const deleteJalur = async (req, res) => {
       },
     });
     if (!jalur) return res.status(404).json({ msg: "Data tidak ditemukan" });
-    const { nama_jalur } = req.body;
     if (req.role === "admin") {
       await Jalur.destroy({
         where: {

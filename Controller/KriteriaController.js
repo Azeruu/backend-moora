@@ -1,14 +1,12 @@
-// import Nilai from "../models/NilaiModel.js";
+import Kriteria from "../models/KriteriaModel.js";
 // import User from "../models/UserModel.js";
 // import Siswa from "../models/SiswaModel.js";
 import { Op } from "sequelize";
 
 //get Nilai
-export const getNilai = async (req, res) => {
+export const getKriteria = async (req, res) => {
   try {
-    let response;
-    if (req.role === "admin") {
-      response = await Nilai.findAll({
+      let response = await Kriteria.findAll({
         // include: [
         //   {
         //     model: User,
@@ -16,28 +14,6 @@ export const getNilai = async (req, res) => {
         //   },
         // ],
       });
-    } else {
-      const dataSiswaId = await Siswa.findOne({
-        where: {
-          userId: req.userId, // Mencocokkan userId dengan req.userId
-        },
-      });
-      if (!dataSiswaId) {
-        return res.status(404).json({ msg: "Data Siswa tidak ditemukan" });
-      }
-      response = await Nilai.findAll({
-        // Menggunakan Where agar user hanya bisa melihat data yang ia input saja
-        where:{
-          dataSiswaId : dataSiswaId.id,
-        }
-        // include: [
-        //   {
-        //     model: User,
-        //     attributes: ["id", "username", "email"],
-        //   },
-        // ],
-      });
-    }
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ msg: error.message });
@@ -45,213 +21,100 @@ export const getNilai = async (req, res) => {
 };
 
 //get Nilai By ID
-export const getNilaiById = async (req, res) => {
+export const getKriteriaById = async (req, res) => {
   try {
-    const nilai = await Nilai.findOne({
+    const kriteria = await Kriteria.findOne({
       where: [
         {
-          dataSiswaId: req.params.id,
+          id: req.params.id,
         },
       ],
     });
-    if (!nilai) return res.status(404).json({ msg: "Data Tidak Ditemukan" });
-    let response;
-    if (req.role === "admin") {
-      response = await Nilai.findOne({
-        // include: [
-        //   {
-        //     model: User,
-        //     atributes: ["id","username", "password"],
-        //   },
-        // ],
-      });
-    } else {
-      response = await Nilai.findOne({
-        where: {
-          [Op.and]: [{ id: nilai.id }, { userId: req.userId }],
-        },
-        // include: [
-        //   {
-        //     model: User,
-        //     attributes: ["id","username", "email"],
-        //   },
-        // ],
-      });
-    }
-    res.status(200).json(response);
+    if (!kriteria) return res.status(404).json({ msg: "Data Tidak Ditemukan" });
+    res.status(200).json(kriteria);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
-export const createNilai = async (req, res) => {
+export const createKriteria = async (req, res) => {
   const {
-    dataSiswaId,
-    pkn1,
-    bindo1,
-    mtk1,
-    ips1,
-    ipa1,
-    pkn2,
-    bindo2,
-    mtk2,
-    ips2,
-    ipa2,
-    pkn3,
-    bindo3,
-    mtk3,
-    ips3,
-    ipa3,
-    pkn4,
-    bindo4,
-    mtk4,
-    ips4,
-    ipa4,
-    pkn5,
-    bindo5,
-    mtk5,
-    ips5,
-    ipa5,
+    kode_kriteria,
+    nama_kriteria,
+    bobot_kriteria
   } = req.body;
   try {
-    const siswaBaru = await Nilai.create({
-      dataSiswaId: dataSiswaId,
-      pkn1: pkn1,
-      bindo1: bindo1,
-      mtk1: mtk1,
-      ips1: ips1,
-      ipa1: ipa1,
-      pkn2: pkn2,
-      bindo2: bindo2,
-      mtk2: mtk2,
-      ips2: ips2,
-      ipa2: ipa2,
-      pkn3: pkn3,
-      bindo3: bindo3,
-      mtk3: mtk3,
-      ips3: ips3,
-      ipa3: ipa3,
-      pkn4: pkn4,
-      bindo4: bindo4,
-      mtk4: mtk4,
-      ips4: ips4,
-      ipa4: ipa4,
-      pkn5: pkn5,
-      bindo5: bindo5,
-      mtk5: mtk5,
-      ips5: ips5,
-      ipa5: ipa5,
+    const KriteriaBaru = await Kriteria.create({
+      kode_krieria:kode_kriteria,
+      nama_kriteria:nama_kriteria,
+      bobot_kriteria:bobot_kriteria
     });
-    res.status(201).json({ msg: "Data Nilai Berhasil Diinput", idSiswaBaru : siswaBaru.dataSiswaId});
+    res.status(201).json({ msg: "Data Nilai Berhasil Diinput", idKriteriaBaru : KriteriaBaru.id});
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
 
 //UPDATE Nilai
-export const updateNilai = async (req, res) => {
-  const nilai = await Nilai.findOne({
+export const updateKriteria = async (req, res) => {
+  const kriteria = await Kriteria.findOne({
     where: {
-      dataSiswaId: req.params.id,
+      id: req.params.id,
     },
   });
 
-  if (!nilai) {
-    return res.status(404).json({ msg: "Data Nilai tidak ditemukan" });
+  if (!kriteria) {
+    return res.status(404).json({ msg: "Data Kriteria tidak ditemukan" });
   }
   const {
-    pkn1,
-    bindo1,
-    mtk1,
-    ips1,
-    ipa1,
-    pkn2,
-    bindo2,
-    mtk2,
-    ips2,
-    ipa2,
-    pkn3,
-    bindo3,
-    mtk3,
-    ips3,
-    ipa3,
-    pkn4,
-    bindo4,
-    mtk4,
-    ips4,
-    ipa4,
-    pkn5,
-    bindo5,
-    mtk5,
-    ips5,
-    ipa5,
+    kode_kriteria,
+    nama_kriteria,
+    bobot_kriteria
   } = req.body;
   try {
     if (req.role === "admin") {
-      await Nilai.update(
+      await Kriteria.update(
         {
-          pkn1,
-          bindo1,
-          mtk1,
-          ips1,
-          ipa1,
-          pkn2,
-          bindo2,
-          mtk2,
-          ips2,
-          ipa2,
-          pkn3,
-          bindo3,
-          mtk3,
-          ips3,
-          ipa3,
-          pkn4,
-          bindo4,
-          mtk4,
-          ips4,
-          ipa4,
-          pkn5,
-          bindo5,
-          mtk5,
-          ips5,
-          ipa5,
+          kode_kriteria,
+          nama_kriteria,
+          bobot_kriteria
         },
         {
           where: {
-            dataSiswaId: nilai.dataSiswaId,
+            id: kriteria.id,
           },
         }
       );
     } else {
         return res.status(403).json({ msg: "Anda tidak memiliki akses" });
     }
-    res.status(200).json({ msg: "Data Siswa Berhasil Diupdate" });
+    res.status(200).json({ msg: "Data Kriteria Berhasil Diupdate" });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
 
-//HAPUS Nilai
-export const deleteNilai = async (req, res) => {
+//HAPUS Kriteria
+export const deleteKriteria = async (req, res) => {
   try {
-    const nilai = await Nilai.findOne({
+    const kriteria = await Kriteria.findOne({
       where: {
-        dataSiswaId: req.params.id,
+        id: req.params.id,
       },
     });
 
-    if (!nilai) {
-      return res.status(404).json({ msg: "Data Nilai tidak ditemukan" });
+    if (!kriteria) {
+      return res.status(404).json({ msg: "Data Kriteria tidak ditemukan" });
     }
     if (req.role === "admin") {
-      await Nilai.destroy({
+      await Kriteria.destroy({
         where: {
-          id: nilai.id,
+          id: kriteria.id,
         },
       });
     } else {
         return res.status(403).json({ msg: "Anda tidak memiliki akses" });
     }
-    res.status(200).json({ msg: "Data Siswa Berhasil Dihapus" });
+    res.status(200).json({ msg: "Data Krtieria Berhasil Dihapus" });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

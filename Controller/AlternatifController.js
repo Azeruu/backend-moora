@@ -115,11 +115,11 @@ export const createAlternatif = async (req, res, next) => {
     nama_alernatif
   } = req.body;
   try {
-    const AlternatifBaru = await Alternatif.create({
+    const alternatifBaru = await Alternatif.create({
       kode_alternatif:kode_alternatif,
       nama_alernatif:nama_alernatif
     });
-    res.status(201).json({msg : 'Data Alternatif Berhasil Diinput'});
+    res.status(201).json({msg : 'Data Alternatif Berhasil Diinput', idAlternatifBaru : alternatifBaru.id});
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

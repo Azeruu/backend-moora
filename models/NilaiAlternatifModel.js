@@ -1,4 +1,6 @@
 import { Sequelize } from "sequelize";
+import Alternatif from "../models/AlternatifModel.js";
+import Kriteria from "../models/KriteriaModel.js";
 import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
@@ -34,7 +36,7 @@ const NilaiAlternatifModel = db.define(
         notEmpty: true,
       },
     },
-    Keterangan: {
+    keterangan: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -50,5 +52,8 @@ const NilaiAlternatifModel = db.define(
 // (async()=>{
 //   await db.sync({alter:true});
 // })();
+NilaiAlternatifModel.belongsTo(Alternatif,{foreignKey:"nama_alternatif"});
+NilaiAlternatifModel.belongsTo(Kriteria,{foreignKey:"nama_kriteria"});
+
 
 export default NilaiAlternatifModel;
