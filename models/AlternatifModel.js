@@ -1,8 +1,9 @@
 import { Sequelize } from "sequelize";
 import User from "./UserModel.js";
-import Jalur from "./JalurModel.js";
+// import Jalur from "./JalurModel.js";
+// import NilaiAlternatifModel from "./NilaiAlternatifModel.js";
 import db from "../config/Database.js";
-import Hasil from "./HasilModel.js";
+// import Hasil from "./HasilModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -40,9 +41,10 @@ const AlternatifModel = db.define(
 // (async()=>{
 //   await db.sync();
 // })();
-User.hasMany(AlternatifModel);
-Jalur.hasMany(AlternatifModel);
-AlternatifModel.hasOne(Hasil);
+// AlternatifModel.hasMany(NilaiAlternatifModel);
+// AlternatifModel.hasOne(Hasil);
+AlternatifModel.belongsTo(User,{foreignKey:"userId"});
+// AlternatifModel.belongsTo(Jalur);
 
 
 export default AlternatifModel;

@@ -29,10 +29,11 @@ export const getJalurById = async (req, res) => {
 
 //CREATE Jalur
 export const createJalur = async (req, res) => {
-  const { nama_jalur } = req.body;
+  const {  kode_jalur, nama_jalur } = req.body;
   try {
     await Jalur.create({
-      nama_jalur: nama_jalur,
+      kode_jalur: kode_jalur,
+      nama_jalur: nama_jalur
     });
     res.status(201).json({ msg: "Data Jalur Berhasil Diinput" });
   } catch (error) {
@@ -49,11 +50,12 @@ export const updateJalur = async (req, res) => {
       },
     });
     if (!jalur) return res.status(404).json({ msg: "Data tidak ditemukan" });
-    const { nama_jalur } = req.body;
+    const { kode_jalur, nama_jalur } = req.body;
     if (req.role === "admin") {
       await Jalur.update(
         {
-          nama_jalur,
+          kode_jalur,
+          nama_jalur
         },
         {
           where: {
@@ -66,7 +68,8 @@ export const updateJalur = async (req, res) => {
         return res.status(403).json({ msg: "Anda tidak memiliki akses" });
       await Jalur.update(
         {
-          nama_jalur,
+          kode_jalur,
+          nama_jalur
         },
         {
           where: {

@@ -1,9 +1,9 @@
 //get all users
-GET http://localhost:5000/users
+GET http://localhost:3001/users
 
 ###
 //get single user
-GET http://localhost:5000/users/a4897d7f-fc42-430b-ad2e-9dca319fac7a
+GET http://localhost:3001/users/a4897d7f-fc42-430b-ad2e-9dca319fac7a
 
 ###
 //create user
@@ -19,8 +19,20 @@ Content-Type: application/json
 }
 
 ###
+//create Admin
+POST http://localhost:3001/users
+Content-Type: application/json
+
+{
+    "username" : "admin",
+    "email" : "admin@gmail.com",
+    "password" : "123",
+    "confirmPassword" : "123",
+    "role" : "admin"
+}
+###
 //update User
-PATCH  http://localhost:5000/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
+PATCH  http://localhost:3001/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
 Content-Type: application/json
 
 {
@@ -32,11 +44,11 @@ Content-Type: application/json
 }
 ###
 //hapus user
-DELETE  http://localhost:5000/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
+DELETE  http://localhost:3001/users/b94fcbcc-c67e-4813-8c31-9208eb1d50d4
 
 ###
 //Login admin
-POST http://localhost:5000/login
+POST http://localhost:3001/login
 Content-Type: application/json
 
 {
@@ -45,7 +57,7 @@ Content-Type: application/json
 }
 ###
 //Login user
-POST http://localhost:5000/login
+POST http://localhost:3001/login
 Content-Type: application/json
 
 {
@@ -55,24 +67,24 @@ Content-Type: application/json
 
 ###
 //Me
-GET http://localhost:5000/me
+GET http://localhost:3001/me
 
 ###
 //Logout
-DELETE  http://localhost:5000/logout
+DELETE  http://localhost:3001/logout
 
 
 ###
-//get all data siswa
-GET http://localhost:5000/data_siswa
+//get all data alternatif
+GET http://localhost:3001/alternatif
 
 ###
 //get data siswa by ID
-GET http://localhost:5000/data_siswa/263cccb3-7550-461e-82e7-85e46d1149d1
+GET http://localhost:3001/data_siswa/263cccb3-7550-461e-82e7-85e46d1149d1
 
 ###
 //POST data Siswa
-POST http://localhost:5000/data_siswa
+POST http://localhost:3001/data_siswa
 Content-Type: application/json
 
 {
@@ -95,7 +107,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH  http://localhost:5000/data_siswa/22f2a72a-e401-46db-8d5e-b49a05d463d8
+PATCH  http://localhost:3001/data_siswa/22f2a72a-e401-46db-8d5e-b49a05d463d8
 Content-Type: application/json
 
 {
@@ -112,10 +124,39 @@ Content-Type: application/json
     "agama":"Islam"
 }
 ###
-DELETE  http://localhost:5000/data_siswa/36198941-ecd1-42ed-86aa-ace90ba323c0
+DELETE  http://localhost:3001/data_siswa/36198941-ecd1-42ed-86aa-ace90ba323c0
+
 
 ###
-POST http://localhost:5000/rekap_nilai
+//get all data kriteria
+GET http://localhost:3001/kriteria
+
+###
+//get all data alternatif
+GET http://localhost:3001/alternatif
+
+###
+//POST data Alternatif
+POST http://localhost:3001/alternatif
+Content-Type: application/json
+
+{
+    "kode_alternatif":"A1",
+    "nama_alternatif":"Reza",
+    "nama_jalur":"Zonasi"
+}
+###
+//POST data Jalur
+POST http://localhost:3001/jalur
+Content-Type: application/json
+
+{
+    "kode_jalur":"J1",
+    "nama_jalur":"Zonasi"
+}
+
+###
+POST http://localhost:3001/rekap_nilai
 Content-Type: application/json
 {
         "pkn1" : "pkn1",
@@ -145,7 +186,7 @@ Content-Type: application/json
         "ipa5" : "ipa5"
 }
 ###
-POST http://localhost:5000/data_siswa
+POST http://localhost:3001/data_siswa
 Content-Type: application/json
 
 {
@@ -170,7 +211,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:5000/data_nilai
+POST http://localhost:3001/data_nilai
 Content-Type: application/json
 
 {

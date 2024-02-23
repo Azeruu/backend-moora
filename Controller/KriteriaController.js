@@ -44,11 +44,11 @@ export const createKriteria = async (req, res) => {
   } = req.body;
   try {
     const KriteriaBaru = await Kriteria.create({
-      kode_krieria:kode_kriteria,
+      kode_kriteria:kode_kriteria,
       nama_kriteria:nama_kriteria,
       bobot_kriteria:bobot_kriteria
     });
-    res.status(201).json({ msg: "Data Nilai Berhasil Diinput", idKriteriaBaru : KriteriaBaru.id});
+    res.status(201).json({ msg: "Data Kriteria Berhasil Diinput", idKriteriaBaru : KriteriaBaru.id});
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

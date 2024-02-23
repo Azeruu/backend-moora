@@ -1,0 +1,137 @@
+//get all users
+GET http://localhost:3001/users
+
+###
+//get single user
+GET http://localhost:3001/users/2
+
+###
+//create user
+POST http://localhost:3001/users
+Content-Type: application/json
+
+{
+    "username" : "reza",
+    "email" : "reza@gmail.com",
+    "password" : "123",
+    "confirmPassword" : "123",
+    "role" : "user"
+}
+
+###
+//create Admin
+POST http://localhost:3001/users
+Content-Type: application/json
+
+{
+    "username" : "admin",
+    "email" : "admin@gmail.com",
+    "password" : "123",
+    "confirmPassword" : "123",
+    "role" : "admin"
+}
+###
+//update User
+PATCH  http://localhost:3001/users/1
+Content-Type: application/json
+
+{
+    "username" : "reza",
+    "email" : "reza@gmail.com",
+    "password" : "",
+    "confirmPassword" : "",
+    "role" : "user"
+}
+###
+//hapus user
+DELETE  http://localhost:3001/users/1
+
+###
+//Login admin
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+    "email" : "admin@gmail.com",
+    "password" : "123"
+}
+###
+//Login user
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+    "email" : "dimas@gmail.com",
+    "password" : "123456"
+}
+
+###
+//Me
+GET http://localhost:3001/me
+
+###
+//Logout
+DELETE  http://localhost:3001/logout
+
+###
+//get all data kriteria
+GET http://localhost:3001/kriteria
+
+###
+//get all data alternatif
+GET http://localhost:3001/alternatif
+
+###
+//get all data Hasil
+GET http://localhost:3001/hasil
+
+###
+//get all data Jalur
+GET http://localhost:3001/jalur
+
+###
+//get all data Nilai Alternatif
+GET http://localhost:3001/nilai_alternatif
+
+###
+//POST data Alternatif
+POST http://localhost:3001/alternatif
+Content-Type: application/json
+
+{
+    "kode_alternatif":"A4",
+    "nama_alternatif":"Nibros",
+    "nama_jalur":"Zonasi"
+}
+###
+//POST data Jalur
+POST http://localhost:3001/jalur
+Content-Type: application/json
+
+{
+    "kode_jalur":"J4",
+    "nama_jalur":"Prestasi"
+}
+###
+//POST data Kriteria
+POST http://localhost:3001/kriteria
+Content-Type: application/json
+
+{
+    "kode_kriteria":"K1",
+    "nama_kriteria":"Jarak",
+    "bobot_kriteria":0.5
+
+}
+###
+//POST data Nilai alternatif
+POST http://localhost:3001/nilai_alternatif
+Content-Type: application/json
+
+{
+    "nama_alternatif":"Denny",
+    "nama_kriteria":"Jarak",
+    "nilai_real":1250,
+    "nilai_fuzzy":3,
+    "keterangan":"Cukup"
+}

@@ -1,7 +1,8 @@
 import { Sequelize } from "sequelize";
 import Alternatif from "../models/AlternatifModel.js";
-import Kriteria from "../models/KriteriaModel.js";
+// import Kriteria from "../models/KriteriaModel.js";
 import db from "../config/Database.js";
+import User from "./UserModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -52,8 +53,10 @@ const NilaiAlternatifModel = db.define(
 // (async()=>{
 //   await db.sync({alter:true});
 // })();
-Alternatif.hasMany(NilaiAlternatifModel);
-Kriteria.hasMany(NilaiAlternatifModel);
+
+// NilaiAlternatifModel.belongsTo(Kriteria)
+NilaiAlternatifModel.belongsTo(Alternatif)
+NilaiAlternatifModel.belongsTo(User)
 
 
 export default NilaiAlternatifModel;

@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import Alternatif from "./AlternatifModel.js";
 import db from "../config/Database.js";
+import User from "./UserModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -30,5 +31,6 @@ const HasilModel = db.define(
 // (async()=>{
 //   await db.sync();
 // })();
-
+HasilModel.belongsTo(Alternatif)
+HasilModel.belongsTo(User)
 export default HasilModel;

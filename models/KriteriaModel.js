@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import NilaiAlternatifModel from "./NilaiAlternatifModel.js";
 import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
@@ -37,5 +38,5 @@ const KriteriaModel = db.define(
 // (async()=>{
 //   await db.sync({alter:true});
 // })();
-
+KriteriaModel.hasMany(NilaiAlternatifModel);
 export default KriteriaModel;

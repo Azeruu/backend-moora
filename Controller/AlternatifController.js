@@ -11,7 +11,8 @@ export const getAlternatif = async (req, res) => {
         attributes: [
           "id",
           "kode_alternatif",
-          "nama_alernatif",
+          "nama_alternatif",
+          "nama_jalur"
         ],
         include: [
           {
@@ -25,7 +26,8 @@ export const getAlternatif = async (req, res) => {
         attributes: [
           "id",
           "kode_alternatif",
-          "nama_alernatif",
+          "nama_alternatif",
+          "nama_jalur"
         ],
         // Menggunakan Where agar user hanya bisa melihat data yang ia input saja
         where: {
@@ -60,7 +62,8 @@ export const getAlternatifById = async (req, res) => {
         attributes: [
           "id",
           "kode_alternatif",
-          "nama_alernatif",
+          "nama_alternatif",
+          "nama_jalur"
         ],
         where: {
           userId: alt.userId,
@@ -78,7 +81,8 @@ export const getAlternatifById = async (req, res) => {
         attributes: [
           "id",
           "kode_alternatif",
-          "nama_alernatif",
+          "nama_alternatif",
+          "nama_jalur"
         ],
         where: {
           [Op.and]: [{ id: alt.id }, { userId: req.userId }],
@@ -112,12 +116,16 @@ export const createAlternatif = async (req, res, next) => {
     }
   const {
     kode_alternatif,
-    nama_alernatif
+    nama_alternatif,
+    nama_jalur,
   } = req.body;
   try {
     const alternatifBaru = await Alternatif.create({
       kode_alternatif:kode_alternatif,
-      nama_alernatif:nama_alernatif
+      nama_alternatif:nama_alternatif,
+      nama_jalur:nama_jalur,
+      userId:req.userId,
+      jalurId:req.jalurId
     });
     res.status(201).json({msg : 'Data Alternatif Berhasil Diinput', idAlternatifBaru : alternatifBaru.id});
   } catch (error) {
@@ -136,13 +144,15 @@ export const updateAlternatif = async (req, res) => {
     if(!alt) return res.status(404).json({msg : 'Data tidak ditemukan'});
     const {
         kode_alternatif,
-        nama_alernatif
+        nama_alternatif,
+        nama_jalur
     } = req.body;
     if(req.role === "admin") {
       await Alternatif.update(
         {
         kode_alternatif,
-        nama_alernatif
+        nama_alternatif,
+        nama_jalur
         },
         {
           where: {
@@ -155,7 +165,8 @@ export const updateAlternatif = async (req, res) => {
       await Alternatif.update(
         {
           kode_alternatif,
-          nama_alernatif
+          nama_alternatif,
+          nama_jalur
         },
         {
           where: {

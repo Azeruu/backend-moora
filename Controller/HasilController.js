@@ -27,7 +27,7 @@ export const getHasilById = async (req, res) => {
     const hasil = await Hasil.findOne({
       where: [
         {
-          uuid: req.params.id,
+          id: req.params.id,
         },
       ],
     });
