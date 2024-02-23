@@ -4,14 +4,13 @@ import session from "express-session";
 import dotenv from "dotenv";
 import SequelizeStore from "connect-session-sequelize";
 import FileUpload from "express-fileupload"
-import NilaiRoute from "./Routes/NilaiRoutes.js";
-import RekapNilaiRoute from "./Routes/RekapNilaiRoutes.js";
+import AlternatifRoutes from "./Routes/AlternatifRoutes.js"
+import KriteriaRoutes from "./Routes/KriteriaRoutes.js";
+import NilaiAlternatifRoutes from "./Routes/NilaiAlternatifRoutes.js"
 import UserRoute from "./Routes/UserRoutes.js";
-import SiswaRoute from "./Routes/SiswaRoutes.js";
 import AuthRoutes from "./Routes/AuthRoutes.js";
 import JalurRoute from "./Routes/JalurRoutes.js";
 import HasilRoute from "./Routes/HasilRoutes.js";
-import BuktiRoute from "./Routes/BuktiRoutes.js"
 import PingRoutes from "./Routes/PingRoutes.js";
 import db from "./config/Database.js";
 dotenv.config();
@@ -55,14 +54,13 @@ app.use(cors({
 app.use(FileUpload());
 app.use(express.static("public"));
 app.use(express.json());
-app.use(JalurRoute);
-app.use(UserRoute);
-app.use(NilaiRoute);
+app.use(AlternatifRoutes);
+app.use(KriteriaRoutes);
+app.use(NilaiAlternatifRoutes);
 app.use(HasilRoute);
-app.use(BuktiRoute);
-app.use(RekapNilaiRoute);
-app.use(SiswaRoute);
+app.use(JalurRoute);
 app.use(AuthRoutes);
+app.use(UserRoute);
 app.use(PingRoutes);
 
 store.sync();

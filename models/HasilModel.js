@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import Alternatif from "./AlternatifModel.js";
 import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;

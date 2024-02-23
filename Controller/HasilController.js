@@ -67,61 +67,21 @@ export const createHasil = async (req, res) => {
     const nilai_alternatif = await NilaiAlternatif.findAll({
       order: [['createdAt', 'DESC']],
     });
-    const nilai_alternatif2 = await NilaiAlternatif.findAll();
+        // Membuat objek untuk menyimpan data berdasarkan kriteria
+    const dataPerKriteria = {};
 
-    // Bobot kriteria
-      const bobotUmur = 0.2;
-      const bobotJarak = 0.3;
-      const bobotNilaiPkn = 0.1;
-      const bobotNilaiBindo = 0.1;
-      const bobotNilaiMtk = 0.1;
-      const bobotNilaiIps = 0.1;
-      const bobotNilaiIpa = 0.1;
+    // Memproses setiap nilai alternatif
+    nilai_alternatif.forEach((nilai) => {
+        const { alternatif, kriteria, nilai_fuzzy } = nilai;
 
-      // Nilai Min dan Max dari Kriteria USIA
-      const maxUsia = 13;
-      const minUsia = 11;
-      const maxJarak = 2;
-      const minJarak = 0;
+        // Jika kriteria belum ada dalam objek, buat array baru
+        if (!dataPerKriteria[kriteria]) {
+            dataPerKriteria[kriteria] = [];
+        }
 
-      // Nialai Min dan Max dari Rata-rata nilai MAPEL
-      const maxNilaiPKN = 100;
-      const minNilaiPKN = 50;
-      const maxNilaiBINDO = 100;
-      const minNilaiBINDO = 50;
-      const maxNilaiMTK = 100;
-      const minNilaiMTK = 50;
-      const maxNilaiIPS = 100;
-      const minNilaiIPS = 50;
-      const maxNilaiIPA = 100;
-      const minNilaiIPA = 50;
-        
-    if (nilai_alternatif) {
-
-      // Normalisasi nilai, umur dan jarak
-      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
-      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
-      
-      // Perhitungsn Skor Akhir
-      const nilai =
-          bobotNilaiPkn * normalizedPKN +
-          bobotNilaiBindo * normalizedBINDO +
-          bobotNilaiMtk * normalizedMTK +
-          bobotNilaiIps * normalizedIPS +
-          bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedJarak +
-          bobotUmur * normalizedUsia;
-
-          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
-          // console.log(sortedRekapNilai);
-          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
-          // console.log(peringkat);
-          // console.log(skor_akhir);
+        // Tambahkan nilai ke array kriteria yang sesuai
+        dataPerKriteria[kriteria].push({ alternatif, nilai });
+    });
 
         try {
           await Hasil.create({
@@ -132,9 +92,6 @@ export const createHasil = async (req, res) => {
         } catch (error) {
           res.status(500).json({ msg: error.message });
         }
-    }else if(!rekap_nilai) {
-      return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
-    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: error.message });
@@ -231,7 +188,7 @@ export const deleteHasil = async (req, res) => {
   try {
     const hasil = await Hasil.findOne({
       where: {
-        dataSiswaId:req.params.id
+        id:req.params.id
       },
     });
     if (!hasil) return res.status(404).json({ msg: "Data hasil tidak ditemukan" });

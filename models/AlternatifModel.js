@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import User from "./UserModel.js";
 import Jalur from "./JalurModel.js";
 import db from "../config/Database.js";
+import Hasil from "./HasilModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -29,13 +30,6 @@ const AlternatifModel = db.define(
         notEmpty: true,
       },
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
     
   },
   {
@@ -47,8 +41,8 @@ const AlternatifModel = db.define(
 //   await db.sync();
 // })();
 User.hasMany(AlternatifModel);
-AlternatifModel.belongsTo(User,{foreignkey:'userId'});
-AlternatifModel.belongsTo(Jalur,{foreignkey:'nama_jalur'});
+Jalur.hasMany(AlternatifModel);
+AlternatifModel.hasOne(Hasil);
 
 
 export default AlternatifModel;

@@ -5,7 +5,7 @@ import { Op } from "sequelize";
 export const getUsers = async (req, res) => {
     try {
         const response = await User.findAll({
-            attributes:['id','uuid','username','email','role']
+            attributes:['id','username','email','role']
         });
         res.status(200).json(response);
     } catch (error) {
@@ -15,9 +15,9 @@ export const getUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
     try {
         const response = await User.findOne({
-            attributes:['id','uuid','username','email','role'],
+            attributes:['id','username','email','role'],
             where:{
-                uuid:req.params.id
+                id:req.params.id
             }
         });
         res.status(200).json(response);
@@ -58,7 +58,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
     const user = await User.findOne({
       where: {
-        uuid: req.params.id,
+        id: req.params.id,
       },
     });
     if(!user)return res.status(404).json({msg : "User Tidak ditemukan"});
@@ -89,14 +89,14 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     const user = await User.findOne({
       where: {
-        uuid: req.params.id,
+        id: req.params.id,
       },
     });
     if(!user)return res.status(404).json({msg : "User Tidak ditemukan"});
     try {
       await User.destroy({
         where:{
-            uuid:user.uuid
+            id:user.uuid
         }
       });
       res.status(200).json({ msg: "User Berhasil dihapus" });

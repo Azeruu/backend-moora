@@ -52,8 +52,8 @@ const NilaiAlternatifModel = db.define(
 // (async()=>{
 //   await db.sync({alter:true});
 // })();
-NilaiAlternatifModel.belongsTo(Alternatif,{foreignKey:"nama_alternatif"});
-NilaiAlternatifModel.belongsTo(Kriteria,{foreignKey:"nama_kriteria"});
+Alternatif.hasMany(NilaiAlternatifModel);
+Kriteria.hasMany(NilaiAlternatifModel);
 
 
 export default NilaiAlternatifModel;
