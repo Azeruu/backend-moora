@@ -1,7 +1,8 @@
 import { Sequelize } from "sequelize";
 import Alternatif from "./AlternatifModel.js";
-import db from "../config/Database.js";
 import User from "./UserModel.js";
+import Jalur from "./JalurModel.js";
+import db from "../config/Database.js";
 
 const { DataTypes } = Sequelize;
 
@@ -9,6 +10,13 @@ const HasilModel = db.define(
   "hasil",
   {
     nama_alternatif: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    jalur_pendaftaran: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -33,4 +41,5 @@ const HasilModel = db.define(
 // })();
 HasilModel.belongsTo(Alternatif)
 HasilModel.belongsTo(User)
+HasilModel.belongsTo(Jalur)
 export default HasilModel;

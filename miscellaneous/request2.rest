@@ -11,8 +11,8 @@ POST http://localhost:3001/users
 Content-Type: application/json
 
 {
-    "username" : "reza",
-    "email" : "reza@gmail.com",
+    "username" : "reza3",
+    "email" : "reza3@gmail.com",
     "password" : "123",
     "confirmPassword" : "123",
     "role" : "user"
@@ -32,19 +32,19 @@ Content-Type: application/json
 }
 ###
 //update User
-PATCH  http://localhost:3001/users/1
+PATCH  http://localhost:3001/users/4
 Content-Type: application/json
 
 {
-    "username" : "reza",
-    "email" : "reza@gmail.com",
+    "username" : "rezaaja",
+    "email" : "rezaaja@gmail.com",
     "password" : "",
     "confirmPassword" : "",
     "role" : "user"
 }
 ###
 //hapus user
-DELETE  http://localhost:3001/users/1
+DELETE  http://localhost:3001/users/4
 
 ###
 //Login admin
@@ -99,9 +99,9 @@ POST http://localhost:3001/alternatif
 Content-Type: application/json
 
 {
-    "kode_alternatif":"A4",
-    "nama_alternatif":"Nibros",
-    "nama_jalur":"Zonasi"
+    "kode_alternatif":"A3",
+    "nama_alternatif":"Aldi Giri",
+    "nama_jalur":"Afirmasi"
 }
 ###
 //POST data Jalur
@@ -118,7 +118,18 @@ POST http://localhost:3001/kriteria
 Content-Type: application/json
 
 {
-    "kode_kriteria":"K1",
+    "kode_kriteria":"C3",
+    "nama_kriteria":"Usia",
+    "bobot_kriteria":0.2
+
+}
+###
+//Edit data Kriteria
+PATCH http://localhost:3001/kriteria/1
+Content-Type: application/json
+
+{
+    "kode_kriteria":"C1",
     "nama_kriteria":"Jarak",
     "bobot_kriteria":0.5
 
@@ -130,8 +141,17 @@ Content-Type: application/json
 
 {
     "nama_alternatif":"Denny",
-    "nama_kriteria":"Jarak",
-    "nilai_real":1250,
+    "nama_kriteria":"Usia",
+    "nilai_real":12,
     "nilai_fuzzy":3,
-    "keterangan":"Cukup"
+    "keterangan":"Baik"
+}
+
+###
+//POST data Hasil
+POST http://localhost:3001/hasil
+Content-Type: application/json
+
+{
+    "example":"example"
 }

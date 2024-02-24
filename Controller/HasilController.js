@@ -2,6 +2,7 @@ import Hasil from "../models/HasilModel.js";
 import User from "../models/UserModel.js";
 import NilaiAlternatif from "../models/NilaiAlternatifModel.js";
 import { Op } from "sequelize";
+import AlternatifModel from "../models/AlternatifModel.js";
 
 //get Hasil
 export const getHasil = async (req, res) => {
@@ -62,41 +63,73 @@ export const getHasilById = async (req, res) => {
 };
 
 // CREATE HASIL
+
 export const createHasil = async (req, res) => {
   try {
+    // Ambil catatan terbaru dari nilai_alternatif dan data_alternatif
     const nilai_alternatif = await NilaiAlternatif.findAll({
       order: [['createdAt', 'DESC']],
     });
-        // Membuat objek untuk menyimpan data berdasarkan kriteria
-    const dataPerKriteria = {};
 
-    // Memproses setiap nilai alternatif
-    nilai_alternatif.forEach((nilai) => {
-        const { alternatif, kriteria, nilai_fuzzy } = nilai;
-
-        // Jika kriteria belum ada dalam objek, buat array baru
-        if (!dataPerKriteria[kriteria]) {
-            dataPerKriteria[kriteria] = [];
-        }
-
-        // Tambahkan nilai ke array kriteria yang sesuai
-        dataPerKriteria[kriteria].push({ alternatif, nilai });
+    const data_alternatif = await AlternatifModel.findAll({
+      order: [['createdAt', 'DESC']],
     });
 
+    // Buat set untuk melacak nama_alternatif yang sudah diproses
+    const processedNamaAlternatif = new Set();
+
+    // Iterasi melalui nilai_alternatif dan masukkan catatan ke dalam tabel Hasil
+    for (const nilai of nilai_alternatif) {
+      const namaAlternatif = nilai.nama_alternatif;
+
+      // Cek apakah nama_alternatif sudah diproses sebelumnya
+      if (!processedNamaAlternatif.has(namaAlternatif)) {
+        const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+          where: { nama_alternatif: namaAlternatif }
+        });
+
+        // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+        let totalNilaiFuzzy = 0;
+        dataNilaiAlternatif.forEach((data) => {
+          totalNilaiFuzzy += data.nilai_fuzzy;
+        });
+
+        const dataAlternatif = data_alternatif.find(data => data.nama_alternatif === namaAlternatif);
+        const jalurPendaftaran = dataAlternatif ? dataAlternatif.nama_jalur : null;
+
         try {
+          // Masukkan catatan ke dalam tabel Hasil
           await Hasil.create({
-            nama_alternatif: nilai_alternatif.nama_alternatif,
-            nilai: nilai,
+            nama_alternatif: namaAlternatif,
+            jalur_pendaftaran: jalurPendaftaran,
+            nilai: totalNilaiFuzzy, // Masukkan total nilai fuzzy
+            dataAlternatifId:dataAlternatif.id,
+            userId:req.params.id,
+            jalurId:dataAlternatif.jalurId
           });
-          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+
+          // Tandai nama_alternatif sebagai sudah diproses
+          processedNamaAlternatif.add(namaAlternatif);
         } catch (error) {
-          res.status(500).json({ msg: error.message });
+          console.error("Error inserting record into Hasil table:", error);
+          // Tangani kesalahan jika penyisipan gagal
+          return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
         }
+      }
+    }
+
+    // Beri respons dengan pesan sukses setelah semua catatan dimasukkan
+    res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: error.message });
+    console.error("Error:", error);
+    // Tangani kesalahan jika pengambilan catatan gagal
+    res.status(500).json({ msg: "Terjadi kesalahan pada server" });
   }
 };
+
+
+
+
 
 //UPDATE Hasil
 export const updateHasil = async (req, res) => {

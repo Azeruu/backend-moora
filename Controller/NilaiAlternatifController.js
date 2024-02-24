@@ -110,7 +110,10 @@ export const updateNilaiAlternatif = async (req, res) => {
       nama_kriteria: nama_kriteria,
       nilai_real: nilai_real,
       nilai_fuzzy: nilai_fuzzy,
-      keterangan: keterangan
+      keterangan: keterangan,
+      dataAlternatifId:req.dataAlternatifId,
+      userId:req.userId,
+      dataKriteriumId:req.dataKriteriumId
     },
     {
       where:{
