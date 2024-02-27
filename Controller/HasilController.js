@@ -111,7 +111,7 @@ export const createHasil = async (req, res) => {
           // Tandai nama_alternatif sebagai sudah diproses
           processedNamaAlternatif.add(namaAlternatif);
         } catch (error) {
-          console.error("Error inserting record into Hasil table:", error);
+          console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
           // Tangani kesalahan jika penyisipan gagal
           return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
         }

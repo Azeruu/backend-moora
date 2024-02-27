@@ -140,18 +140,31 @@ POST http://localhost:3001/nilai_alternatif
 Content-Type: application/json
 
 {
-    "nama_alternatif":"Denny",
-    "nama_kriteria":"Usia",
-    "nilai_real":12,
+    "nama_alternatif":"Nibros",
+    "nama_kriteria":"Jarak",
+    "nilai_real":960,
     "nilai_fuzzy":3,
     "keterangan":"Baik"
 }
 
 ###
-//POST data Hasil
-POST http://localhost:3001/hasil
+//EDIT data Nilai alternatif
+PATCH http://localhost:3001/nilai_alternatif/2
 Content-Type: application/json
 
 {
-    "example":"example"
+    "nama_alternatif":"Rifki",
+    "nama_kriteria":"Nilai Rapot",
+    "nilai_real":82.5,
+    "nilai_fuzzy":3,
+    "keterangan":"Baik"
 }
+
+###
+//get all data Hasil
+GET http://localhost:3001/hasil
+
+###
+//POST data Hasil
+POST http://localhost:3001/hasil
+

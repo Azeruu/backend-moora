@@ -19,7 +19,7 @@ const app = express();
 
  (async () => {
      await db.sync();
-    console.log("berhasil tersingkron semua");
+    console.log("Sinkronisasi Database Berhasil");
  })();
 
 const sessionStore = SequelizeStore(session.Store); 
@@ -35,7 +35,7 @@ app.use(session({
     store: store,
     cookie: {
         secure: 'auto',
-        sameSite: 'None',
+        // sameSite: 'None',
         httpOnly: true,
         path: '/',
     },
