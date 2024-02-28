@@ -6,7 +6,7 @@ import { Op } from "sequelize";
 export const getJalur = async (req, res) => {
   try {
       const response = await Jalur.findAll({
-          attributes:['id','nama_jalur']
+          attributes:['id','kode_jalur','nama_jalur']
       });
       res.status(200).json(response);
   } catch (error) {
@@ -16,7 +16,7 @@ export const getJalur = async (req, res) => {
 export const getJalurById = async (req, res) => {
   try {
       const response = await Jalur.findOne({
-          attributes:['id','nama_jalur'],
+          attributes:['id','kode_jalur','nama_jalur'],
           where:{
               id:req.params.id
           }
