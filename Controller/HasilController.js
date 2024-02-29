@@ -103,9 +103,9 @@ export const createHasil = async (req, res) => {
             nama_alternatif: namaAlternatif,
             jalur_pendaftaran: jalurPendaftaran,
             nilai: totalNilaiFuzzy, // Masukkan total nilai fuzzy
-            dataAlternatifId:dataAlternatif.id,
+            // dataAlternatifId:dataAlternatif.id,
             userId:req.params.id,
-            jalurId:dataAlternatif.jalurId
+            // jalurId:dataAlternatif.jalurId
           });
 
           // Tandai nama_alternatif sebagai sudah diproses

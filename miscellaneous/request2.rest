@@ -99,9 +99,9 @@ POST http://localhost:3001/alternatif
 Content-Type: application/json
 
 {
-    "kode_alternatif":"A3",
-    "nama_alternatif":"Aldi Giri",
-    "nama_jalur":"Afirmasi"
+    "kode_alternatif":"A1",
+    "nama_alternatif":"Reza",
+    "nama_jalur":"Zonasi"
 }
 ###
 //POST data Jalur
@@ -109,8 +109,8 @@ POST http://localhost:3001/jalur
 Content-Type: application/json
 
 {
-    "kode_jalur":"J4",
-    "nama_jalur":"Prestasi"
+    "kode_jalur":"J1",
+    "nama_jalur":"Zonasi"
 }
 ###
 //POST data Kriteria
@@ -141,8 +141,8 @@ Content-Type: application/json
 
 {
     "nama_alternatif":"Nibros",
-    "nama_kriteria":"Jarak",
-    "nilai_real":960,
+    "nama_kriteria":"Nilai Rapot",
+    "nilai_real":86.5,
     "nilai_fuzzy":3,
     "keterangan":"Baik"
 }
@@ -159,6 +159,10 @@ Content-Type: application/json
     "nilai_fuzzy":3,
     "keterangan":"Baik"
 }
+
+###
+//get Nilai Alternatif by Id
+GET http://localhost:3001/nilai_alternatif/5
 
 ###
 //get all data Hasil

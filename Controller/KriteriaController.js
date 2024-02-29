@@ -36,6 +36,8 @@ export const getKriteriaById = async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 };
+
+// INput Kriteria 
 export const createKriteria = async (req, res) => {
   const {
     kode_kriteria,

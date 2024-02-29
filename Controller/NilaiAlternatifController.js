@@ -32,30 +32,7 @@ export const getNilaiAlternatifById = async (req, res) => {
       ],
     });
     if (!nilai_alternatif) return res.status(404).json({ msg: "Data Tidak Ditemukan" });
-    let response;
-    if (req.role === "admin") {
-      response = await NilaiAlternatif.findOne({
-        include: [
-          {
-            model: User,
-            atributes: ["username", "password"],
-          },
-        ],
-      });
-    } else {
-      response = await NilaiAlternatif.findOne({
-        where: {
-          [Op.and]: [{ id: nilai_alternatif.id }],
-        },
-        include: [
-          {
-            model: User,
-            attributes: ["username", "email"],
-          },
-        ],
-      });
-    }
-    res.status(200).json(response);
+    res.status(200).json(nilai_alternatif);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
