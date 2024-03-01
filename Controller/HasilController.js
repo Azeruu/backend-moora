@@ -75,25 +75,32 @@ export const createHasil = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
-    // Buat set untuk melacak nama_alternatif yang sudah diproses
-    const processedNamaAlternatif = new Set();
-
-    // Iterasi melalui nilai_alternatif dan masukkan catatan ke dalam tabel Hasil
+    // Iterasi melalui nilai_alternatif dan perbarui atau tambahkan catatan ke dalam tabel Hasil
     for (const nilai of nilai_alternatif) {
       const namaAlternatif = nilai.nama_alternatif;
 
-      // Cek apakah nama_alternatif sudah diproses sebelumnya
-      if (!processedNamaAlternatif.has(namaAlternatif)) {
-        const dataNilaiAlternatif = await NilaiAlternatif.findAll({
-          where: { nama_alternatif: namaAlternatif }
-        });
+      // Periksa apakah data hasil untuk nama alternatif sudah ada
+      const existingData = await Hasil.findOne({
+        where: { nama_alternatif }
+      });
 
-        // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+      // Jika data sudah ada, lakukan pembaruan nilai
+      if (existingData) {
+        // Jumlahkan kembali nilai fuzzy dari data_nilai_alternatif untuk nama alternatif
         let totalNilaiFuzzy = 0;
+        const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+          where: { nama_alternatif }
+        });
         dataNilaiAlternatif.forEach((data) => {
           totalNilaiFuzzy += data.nilai_fuzzy;
         });
 
+        // Perbarui nilai hasil yang sudah ada
+        await existingData.update({
+          nilai: totalNilaiFuzzy
+        });
+      } else {
+        // Jika data belum ada, tambahkan catatan baru ke dalam tabel Hasil
         const dataAlternatif = data_alternatif.find(data => data.nama_alternatif === namaAlternatif);
         const jalurPendaftaran = dataAlternatif ? dataAlternatif.nama_jalur : null;
 
@@ -107,9 +114,6 @@ export const createHasil = async (req, res) => {
             userId:req.params.id,
             // jalurId:dataAlternatif.jalurId
           });
-
-          // Tandai nama_alternatif sebagai sudah diproses
-          processedNamaAlternatif.add(namaAlternatif);
         } catch (error) {
           console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
           // Tangani kesalahan jika penyisipan gagal
@@ -119,16 +123,13 @@ export const createHasil = async (req, res) => {
     }
 
     // Beri respons dengan pesan sukses setelah semua catatan dimasukkan
-    res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
+    res.status(201).json({ msg: "Data Hasil Berhasil Diinput atau Diperbarui" });
   } catch (error) {
     console.error("Error:", error);
     // Tangani kesalahan jika pengambilan catatan gagal
     res.status(500).json({ msg: "Terjadi kesalahan pada server" });
   }
 };
-
-
-
 
 
 //UPDATE Hasil
