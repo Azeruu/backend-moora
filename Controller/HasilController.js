@@ -3,6 +3,7 @@ import User from "../models/UserModel.js";
 import NilaiAlternatif from "../models/NilaiAlternatifModel.js";
 import { Op } from "sequelize";
 import AlternatifModel from "../models/AlternatifModel.js";
+import HasilModel from "../models/HasilModel.js";
 
 //get Hasil
 export const getHasil = async (req, res) => {
@@ -66,7 +67,7 @@ export const getHasilById = async (req, res) => {
 
 export const createHasil = async (req, res) => {
   try {
-    // Ambil catatan terbaru dari nilai_alternatif dan data_alternatif
+    // Ambil data terbaru dari nilai_alternatif dan data_alternatif
     const nilai_alternatif = await NilaiAlternatif.findAll({
       order: [['createdAt', 'DESC']],
     });
@@ -75,24 +76,43 @@ export const createHasil = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
-    // Buat set untuk melacak nama_alternatif yang sudah diproses
-    const processedNamaAlternatif = new Set();
-
-    // Iterasi melalui nilai_alternatif dan masukkan catatan ke dalam tabel Hasil
+    // Iterasi melalui nilai_alternatif dan periksa apakah sudah ada di tabel Hasil
     for (const nilai of nilai_alternatif) {
       const namaAlternatif = nilai.nama_alternatif;
 
-      // Cek apakah nama_alternatif sudah diproses sebelumnya
-      if (!processedNamaAlternatif.has(namaAlternatif)) {
-        const dataNilaiAlternatif = await NilaiAlternatif.findAll({
-          where: { nama_alternatif: namaAlternatif }
-        });
+    // Cek apakah nama_alternatif sudah ada di tabel Hasil
+    const existingData = await Hasil.findOne({ where: { nama_alternatif : namaAlternatif } });
 
-        // Jumlahkan nilai fuzzy dari data_nilai_alternatif
-        let totalNilaiFuzzy = 0;
-        dataNilaiAlternatif.forEach((data) => {
-          totalNilaiFuzzy += data.nilai_fuzzy;
-        });
+    if (existingData) {
+      // Jika sudah ada, lakukan update nilai
+      const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+        where: { nama_alternatif: namaAlternatif }
+      });
+      // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+      let totalNilaiFuzzy = 0;
+      dataNilaiAlternatif.forEach((data) => {
+        totalNilaiFuzzy += data.nilai_fuzzy;
+      });
+
+      await Hasil.update(
+        {
+          nilai: totalNilaiFuzzy, // Masukkan total nilai fuzzy
+          // userId:req.params.id,
+          // jalur_pendaftaran: jalurPendaftaran, // Tidak perlu diupdate
+        },
+        { where: { nama_alternatif : namaAlternatif} }
+      );
+    } else {
+      // Jika belum ada, tambahkan data baru ke tabel Hasil
+      const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+        where: { nama_alternatif: namaAlternatif }
+      });
+
+      // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+      let totalNilaiFuzzy = 0;
+      dataNilaiAlternatif.forEach((data) => {
+        totalNilaiFuzzy += data.nilai_fuzzy;
+      });
 
         const dataAlternatif = data_alternatif.find(data => data.nama_alternatif === namaAlternatif);
         const jalurPendaftaran = dataAlternatif ? dataAlternatif.nama_jalur : null;
@@ -108,8 +128,6 @@ export const createHasil = async (req, res) => {
             // jalurId:dataAlternatif.jalurId
           });
 
-          // Tandai nama_alternatif sebagai sudah diproses
-          processedNamaAlternatif.add(namaAlternatif);
         } catch (error) {
           console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
           // Tangani kesalahan jika penyisipan gagal
