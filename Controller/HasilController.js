@@ -3,6 +3,7 @@ import User from "../models/UserModel.js";
 import NilaiAlternatif from "../models/NilaiAlternatifModel.js";
 import { Op } from "sequelize";
 import AlternatifModel from "../models/AlternatifModel.js";
+import HasilModel from "../models/HasilModel.js";
 
 //get Hasil
 export const getHasil = async (req, res) => {
@@ -66,7 +67,7 @@ export const getHasilById = async (req, res) => {
 
 export const createHasil = async (req, res) => {
   try {
-    // Ambil catatan terbaru dari nilai_alternatif dan data_alternatif
+    // Ambil data terbaru dari nilai_alternatif dan data_alternatif
     const nilai_alternatif = await NilaiAlternatif.findAll({
       order: [['createdAt', 'DESC']],
     });
@@ -75,32 +76,49 @@ export const createHasil = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
-    // Iterasi melalui nilai_alternatif dan perbarui atau tambahkan catatan ke dalam tabel Hasil
+    // Iterasi melalui nilai_alternatif dan periksa apakah sudah ada di tabel Hasil
     for (const nilai of nilai_alternatif) {
       const namaAlternatif = nilai.nama_alternatif;
 
-      // Periksa apakah data hasil untuk nama alternatif sudah ada
-      const existingData = await Hasil.findOne({
-        where: { nama_alternatif }
+    // Cek apakah nama_alternatif sudah ada di tabel Hasil
+    const existingData = await Hasil.findOne({ where: { nama_alternatif : namaAlternatif } });
+
+    if (existingData) {
+      // Jika sudah ada, lakukan update nilai
+      const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+        where: { nama_alternatif: namaAlternatif }
+      });
+      // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+      let totalNilaiFuzzy = 0;
+        dataNilaiAlternatif.forEach((data) => {
+          // Perhitungan akar kuadrat positif dari seluruh nilai fuzzy
+          totalNilaiFuzzy += Math.sqrt(Math.abs(data.nilai_fuzzy));
+        });
+
+      // Iterasi lagi untuk menghitung nilai fuzzy relatif dan mengupdate nilai fuzzy di Hasil
+      dataNilaiAlternatif.forEach((data) => {
+        const nilaiFuzzyRelatif = Math.abs(data.nilai_fuzzy) / totalNilaiFuzzy;
+
+        // Lakukan update nilai fuzzy relatif di Hasil
+        Hasil.update(
+          { nilai: nilaiFuzzyRelatif },
+          { where: { nama_alternatif: namaAlternatif } }
+        );
       });
 
-      // Jika data sudah ada, lakukan pembaruan nilai
-      if (existingData) {
-        // Jumlahkan kembali nilai fuzzy dari data_nilai_alternatif untuk nama alternatif
-        let totalNilaiFuzzy = 0;
-        const dataNilaiAlternatif = await NilaiAlternatif.findAll({
-          where: { nama_alternatif }
-        });
-        dataNilaiAlternatif.forEach((data) => {
-          totalNilaiFuzzy += data.nilai_fuzzy;
-        });
+    } else {
+      // Jika belum ada, tambahkan data baru ke tabel Hasil
+      const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+        where: { nama_alternatif: namaAlternatif }
+      });
 
-        // Perbarui nilai hasil yang sudah ada
-        await existingData.update({
-          nilai: totalNilaiFuzzy
-        });
-      } else {
-        // Jika data belum ada, tambahkan catatan baru ke dalam tabel Hasil
+       // Hitung total nilai fuzzy dari data_nilai_alternatif dengan kriteria yang sama
+      let totalNilaiFuzzy = 0;
+      dataNilaiAlternatif.forEach((data) => {
+         // Perhitungan akar kuadrat positif dari seluruh nilai fuzzy
+        totalNilaiFuzzy += Math.sqrt(Math.abs(data.nilai_fuzzy));
+      });
+
         const dataAlternatif = data_alternatif.find(data => data.nama_alternatif === namaAlternatif);
         const jalurPendaftaran = dataAlternatif ? dataAlternatif.nama_jalur : null;
 
@@ -113,6 +131,16 @@ export const createHasil = async (req, res) => {
             // dataAlternatifId:dataAlternatif.id,
             userId:req.params.id,
             // jalurId:dataAlternatif.jalurId
+          });
+          // Iterasi lagi untuk menghitung nilai fuzzy relatif dan tambahkan data ke Hasil
+          dataNilaiAlternatif.forEach((data) => {
+            const nilaiFuzzyRelatif = Math.abs(data.nilai_fuzzy) / totalNilaiFuzzy;
+
+            // Masukkan nilai fuzzy relatif ke Hasil
+            Hasil.create({
+              nama_alternatif: namaAlternatif,
+              nilai: nilaiFuzzyRelatif,
+            });
           });
         } catch (error) {
           console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
