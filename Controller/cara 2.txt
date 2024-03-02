@@ -1,0 +1,76 @@
+// Iterasi melalui nilai_alternatif dan periksa apakah sudah ada di tabel Hasil
+    // for (const nilai of nilai_alternatif) {
+    //   const namaAlternatif = nilai.nama_alternatif;
+
+    // // Cek apakah nama_alternatif sudah ada di tabel Hasil
+    // const existingData = await Hasil.findOne({ where: { nama_alternatif : namaAlternatif } });
+
+    // if (existingData) {
+    //   // Jika sudah ada, lakukan update nilai
+    //   const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+    //     where: { nama_alternatif: namaAlternatif }
+    //   });
+
+    //   // PROSES PERHITUNGAN 
+    //   // Jumlahkan nilai fuzzy dari data_nilai_alternatif
+    //   let totalNilaiFuzzy = 0;
+    //     dataNilaiAlternatif.forEach((data) => {
+    //       // Perhitungan akar kuadrat positif dari seluruh nilai fuzzy
+    //       totalNilaiFuzzy += Math.sqrt(Math.abs(data.nilai_fuzzy));
+    //     });
+
+    //   // Iterasi lagi untuk menghitung nilai fuzzy relatif dan mengupdate nilai fuzzy di Hasil
+    //   dataNilaiAlternatif.forEach((data) => {
+    //     const nilaiFuzzyRelatif = Math.abs(data.nilai_fuzzy) / totalNilaiFuzzy;
+
+    //     // Lakukan update nilai fuzzy relatif di Hasil
+    //     Hasil.update(
+    //       { nilai: nilaiFuzzyRelatif },
+    //       { where: { nama_alternatif: namaAlternatif } }
+    //     );
+    //   });
+
+    // } else {
+    //     // Jika belum ada, tambahkan data baru ke tabel Hasil
+    //     const dataNilaiAlternatif = await NilaiAlternatif.findAll({
+    //       where: { nama_alternatif: namaAlternatif }
+    //     });
+
+    //     // PROSES PERHITUNGAN
+    //     // Hitung total nilai fuzzy dari data_nilai_alternatif dengan kriteria yang sama
+    //     let totalNilaiFuzzy = 0;
+    //     dataNilaiAlternatif.forEach((data) => {
+    //       // Perhitungan akar kuadrat positif dari seluruh nilai fuzzy
+    //       totalNilaiFuzzy += Math.sqrt(Math.abs(data.nilai_fuzzy));
+    //     });
+
+    //       const dataAlternatif = data_alternatif.find(data => data.nama_alternatif === namaAlternatif);
+    //       const jalurPendaftaran = dataAlternatif ? dataAlternatif.nama_jalur : null;
+
+    //       try {
+    //         // Masukkan catatan ke dalam tabel Hasil
+    //         await Hasil.create({
+    //           nama_alternatif: namaAlternatif,
+    //           jalur_pendaftaran: jalurPendaftaran,
+    //           nilai: totalNilaiFuzzy, // Masukkan total nilai fuzzy
+    //           // dataAlternatifId:dataAlternatif.id,
+    //           userId:req.params.id,
+    //           // jalurId:dataAlternatif.jalurId
+    //         });
+    //         // Iterasi lagi untuk menghitung nilai fuzzy relatif dan tambahkan data ke Hasil
+    //         dataNilaiAlternatif.forEach((data) => {
+    //           const nilaiFuzzyRelatif = Math.abs(data.nilai_fuzzy) / totalNilaiFuzzy;
+
+    //           // Masukkan nilai fuzzy relatif ke Hasil
+    //           Hasil.create({
+    //             nama_alternatif: namaAlternatif,
+    //             nilai: nilaiFuzzyRelatif,
+    //           });
+    //         });
+    //       } catch (error) {
+    //         console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
+    //         // Tangani kesalahan jika penyisipan gagal
+    //         return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
+    //       }
+    //   }
+    // }
