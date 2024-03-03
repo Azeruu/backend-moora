@@ -113,23 +113,30 @@ export const createHasil = async (req, res) => {
         });
     }
 
-    console.log(summedValues);
+    // console.log(summedValues);
     try {
-        // Menyimpan hasil penjumlahan per alternatif ke dalam tabel Hasil
-        for (const [nama_alternatif, nilai_fuzzy] of Object.entries(summedValues)) {
-          // Temukan jalur_pendaftaran yang sesuai dengan nama_alternatif
-          const nilai = nilai_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif);
-          const jalur_pendaftaran = nilai ? nilai.jalur_pendaftaran : null;
+      // Menyimpan hasil penjumlahan per alternatif ke dalam tabel Hasil
+      for (const [nama_alternatif, nilai_fuzzy] of Object.entries(summedValues)) {
+        // Cari data dalam tabel Hasil dengan nama_alternatif dan jalur_pendaftaran yang sama
+        const existingData = await Hasil.findOne({
+          where: {
+            nama_alternatif,
+            jalur_pendaftaran: data_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif)?.nama_jalur
+          }
+        });
 
-          // Masukkan hasil ke dalam tabel Hasil
-          await Hasil.create({
-              nama_alternatif: nama_alternatif,
-              jalur_pendaftaran: "jalur_pendaftaran",
-              nilai: nilai_fuzzy,
-              userId: req.params.id
-          });
-        }
-      } catch (error) {
+        // Jika data sudah ada, lewati proses penambahan data baru
+        if (existingData) continue;
+
+        // Jika tidak ada data yang sama, masukkan hasil ke dalam tabel Hasil
+        await Hasil.create({
+            nama_alternatif: nama_alternatif,
+            jalur_pendaftaran: data_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif)?.nama_jalur,
+            nilai: nilai_fuzzy,
+            userId: req.params.id
+        });
+      }
+    } catch (error) {
         console.error("Gagal menginput data hasil kedalam tabel Hasil", error);
         // Tangani kesalahan jika penyisipan gagal
         return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
@@ -147,87 +154,84 @@ export const createHasil = async (req, res) => {
 //UPDATE Hasil
 export const updateHasil = async (req, res) => {
   try {
-    const nilai_alternatif = await Hasil.findOne({
-      where: {
-        id : req.params.id
-      },
+    const nilai_alternatif = await NilaiAlternatif.findAll();
+    const data_alternatif = await Alternatif.findAll();
+
+    const groupedData = {};
+    nilai_alternatif.forEach(({ nama_alternatif, nama_kriteria, nilai_fuzzy }) => {
+      groupedData[nama_kriteria] = groupedData[nama_kriteria] || [];
+      groupedData[nama_kriteria].push({ nama_alternatif, nilai_fuzzy });
     });
 
-   // Bobot kriteria
-      const bobotUmur = 0.2;
-      const bobotJarak = 0.3;
-      const bobotNilaiPkn = 0.1;
-      const bobotNilaiBindo = 0.1;
-      const bobotNilaiMtk = 0.1;
-      const bobotNilaiIps = 0.1;
-      const bobotNilaiIpa = 0.1;
-
-      // Nilai Min dan Max dari Kriteria USIA
-      const maxUsia = 13;
-      const minUsia = 11;
-      const maxJarak = 2;
-      const minJarak = 0;
-
-      // Nialai Min dan Max dari Rata-rata nilai MAPEL
-      const maxNilaiPKN = 100;
-      const minNilaiPKN = 50;
-      const maxNilaiBINDO = 100;
-      const minNilaiBINDO = 50;
-      const maxNilaiMTK = 100;
-      const minNilaiMTK = 50;
-      const maxNilaiIPS = 100;
-      const minNilaiIPS = 50;
-      const maxNilaiIPA = 100;
-      const minNilaiIPA = 50;
-        
-    if (rekap_nilai) {
-
-      // Normalisasi nilai, umur dan jarak
-      const normalizedUsia = (maxUsia - rekap_nilai.usia) / (maxUsia - minUsia);
-      const normalizedJarak = (maxJarak - rekap_nilai.jarak) / (maxJarak - minJarak);
-      const normalizedPKN = (rekap_nilai.avrg_nilai_pkn - minNilaiPKN) / (maxNilaiPKN - minNilaiPKN);
-      const normalizedBINDO = (rekap_nilai.avrg_nilai_bindo - minNilaiBINDO) / (maxNilaiBINDO - minNilaiBINDO);
-      const normalizedMTK = (rekap_nilai.avrg_nilai_mtk - minNilaiMTK) / (maxNilaiMTK - minNilaiMTK);
-      const normalizedIPS = (rekap_nilai.avrg_nilai_ips - minNilaiIPS) / (maxNilaiIPS - minNilaiIPS);
-      const normalizedIPA = (rekap_nilai.avrg_nilai_ipa - minNilaiIPA) / (maxNilaiIPA - minNilaiIPA);
-      
-      // Perhitungsn Skor Akhir
-      const skor_akhir =
-          bobotNilaiPkn * normalizedPKN +
-          bobotNilaiBindo * normalizedBINDO +
-          bobotNilaiMtk * normalizedMTK +
-          bobotNilaiIps * normalizedIPS +
-          bobotNilaiIpa * normalizedIPA +
-          bobotJarak * normalizedJarak +
-          bobotUmur * normalizedUsia;
-
-          // const sortedRekapNilai = rekap_nilai2.sort((a, b) => a.skor_akhir - b.skor_akhir);
-          // console.log(sortedRekapNilai);
-          // const peringkat = sortedRekapNilai.findIndex(item => item.dataSiswaId === rekap_nilai.dataSiswaId) + 1;
-          // console.log(peringkat);
-          // console.log(skor_akhir);
-
-        try {
-          await Hasil.update({
-            userId: req.userId,
-            dataSiswaId: rekap_nilai.dataSiswaId,
-            nama_lengkap: rekap_nilai.nama_lengkap,
-            skor_akhir: skor_akhir,
-          },{
-            where:{
-              dataSiswaId:rekap_nilai.dataSiswaId
-          }});
-          res.status(201).json({ msg: "Data Hasil Berhasil Diinput" });
-        } catch (error) {
-          res.status(500).json({ msg: error.message });
-        }
-    }else if(!rekap_nilai) {
-      return res.status(404).json({ msg: "Data Rekap tidak ditemukan" });
+    const squareRootValues = {};
+    for (const [nama_kriteria, data] of Object.entries(groupedData)) {
+      const totalSquaredValue = data.reduce((total, { nilai_fuzzy }) => total + Math.pow(nilai_fuzzy, 2), 0);
+      squareRootValues[nama_kriteria] = Math.sqrt(totalSquaredValue);
     }
+
+    const dividedValues = {};
+    for (const [nama_kriteria, data] of Object.entries(groupedData)) {
+      const squareRootValue = squareRootValues[nama_kriteria];
+      dividedValues[nama_kriteria] = data.map(({ nama_alternatif, nilai_fuzzy }) => ({
+        nama_alternatif,
+        nilai_fuzzy: nilai_fuzzy / squareRootValue
+      }));
+    }
+
+    const bobotKriteria = {};
+    const dataKriteria = await Kriteria.findAll();
+    dataKriteria.forEach(({ nama_kriteria, bobot_kriteria }) => {
+      bobotKriteria[nama_kriteria] = bobot_kriteria;
+    });
+
+    const multipliedValues = {};
+    for (const [nama_kriteria, data] of Object.entries(dividedValues)) {
+      const bobot = bobotKriteria[nama_kriteria];
+      multipliedValues[nama_kriteria] = data.map(({ nama_alternatif, nilai_fuzzy }) => ({
+        nama_alternatif,
+        nilai_fuzzy: nilai_fuzzy * bobot
+      }));
+    }
+
+    const summedValues = {};
+    for (const [nama_kriteria, data] of Object.entries(multipliedValues)) {
+      data.forEach(({ nama_alternatif, nilai_fuzzy }) => {
+        summedValues[nama_alternatif] = (summedValues[nama_alternatif] || 0) + (nilai_fuzzy * (nama_kriteria === "Rata - Rata Nilai Rapot" || nama_kriteria === "Usia" ? 1 : -1));
+      });
+    }
+
+    // console.log(summedValues);
+    try {
+      // Update hasil per alternatif ke dalam tabel Hasil
+      for (const [nama_alternatif, nilai_fuzzy] of Object.entries(summedValues)) {
+        // Temukan data Hasil yang sesuai dengan nama_alternatif
+        const hasil = await Hasil.findOne({ where: { nama_alternatif } });
+        if (hasil) {
+          // Temukan jalur_pendaftaran yang sesuai dengan nama_alternatif
+          const nilai = data_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif);
+          const jalur_pendaftaran = nilai ? nilai.nama_jalur : null;
+
+          // Update nilai hasil
+          await hasil.update({
+            nilai: nilai_fuzzy,
+            jalur_pendaftaran: jalur_pendaftaran
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Gagal mengupdate data hasil di tabel Hasil", error);
+      // Tangani kesalahan jika penyisipan gagal
+      return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
+    }
+    // Beri respons dengan pesan sukses setelah semua catatan dimasukkan
+    res.status(200).json({ msg: "Data Hasil Berhasil Diupdate" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    console.error("Error:", error);
+    // Tangani kesalahan jika pengambilan catatan gagal
+    res.status(500).json({ msg: "Terjadi kesalahan pada server" });
   }
 };
+
 
 //HAPUS Hasil
 export const deleteHasil = async (req, res) => {

@@ -12,7 +12,8 @@ const router = express.Router();
 router.get("/hasil", verifyUser, getHasil);
 router.get("/hasil/:id", verifyUser, getHasilById);
 router.post("/hasil", verifyUser, createHasil);
-router.patch("/hasil/:id", verifyUser, updateHasil);
+// router.patch("/hasil/:id", verifyUser, updateHasil);
+router.patch("/hasil", verifyUser, updateHasil);
 router.delete("/hasil/:id", verifyUser, deleteHasil);
 
 export default router;
