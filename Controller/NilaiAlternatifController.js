@@ -44,7 +44,9 @@ export const createNilaiAlternatif = async (req, res) => {
     nama_kriteria,
     nilai_real,
     nilai_fuzzy,
-    keterangan
+    keterangan,
+    dataAlternatifId,
+    dataKriteriumId
   } = req.body;
   try {
     await NilaiAlternatif.create({
@@ -53,9 +55,9 @@ export const createNilaiAlternatif = async (req, res) => {
       nilai_real: nilai_real,
       nilai_fuzzy: nilai_fuzzy,
       keterangan: keterangan,
-      dataAlternatifId:req.dataAlternatifId,
+      dataAlternatifId:dataAlternatifId,
       userId:req.userId,
-      dataKriteriumId:req.dataKriteriumId
+      dataKriteriumId:dataKriteriumId
     });
     res.status(201).json({ msg: "Data Nilai Alternatif Berhasil Diinput" });
   } catch (error) {
@@ -78,7 +80,9 @@ export const updateNilaiAlternatif = async (req, res) => {
     nama_kriteria,
     nilai_real,
     nilai_fuzzy,
-    keterangan
+    keterangan,
+    dataAlternatifId,
+    dataKriteriumId
   } = req.body;
   try {
     await NilaiAlternatif.update(
@@ -88,9 +92,9 @@ export const updateNilaiAlternatif = async (req, res) => {
       nilai_real: nilai_real,
       nilai_fuzzy: nilai_fuzzy,
       keterangan: keterangan,
-      dataAlternatifId:req.dataAlternatifId,
+      dataAlternatifId:dataAlternatifId,
       userId:req.userId,
-      dataKriteriumId:req.dataKriteriumId
+      dataKriteriumId:dataKriteriumId
     },
     {
       where:{

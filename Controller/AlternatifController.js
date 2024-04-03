@@ -118,6 +118,7 @@ export const createAlternatif = async (req, res, next) => {
     kode_alternatif,
     nama_alternatif,
     nama_jalur,
+    jalurId,
   } = req.body;
   try {
     const alternatifBaru = await Alternatif.create({
@@ -125,7 +126,7 @@ export const createAlternatif = async (req, res, next) => {
       nama_alternatif:nama_alternatif,
       nama_jalur:nama_jalur,
       userId:req.userId,
-      jalurId:req.jalurId
+      jalurId:jalurId
     });
     res.status(201).json({msg : 'Data Alternatif Berhasil Diinput', idAlternatifBaru : alternatifBaru.id});
   } catch (error) {
