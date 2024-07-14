@@ -1,5 +1,6 @@
 import Hasil from "../models/HasilModel.js";
 import User from "../models/UserModel.js";
+import DataAlternatif from "../models/AlternatifModel.js"
 import NilaiAlternatif from "../models/NilaiAlternatifModel.js";
 import Alternatif from "../models/AlternatifModel.js";
 import Kriteria from "../models/KriteriaModel.js";
@@ -13,6 +14,10 @@ export const getHasil = async (req, res) => {
         {
           model: User,
           attributes: ["username", "password"],
+        },
+        {
+          model: DataAlternatif,
+          attributes: ['kode_alternatif'],
         },
       ],
     });
