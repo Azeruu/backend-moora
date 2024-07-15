@@ -161,31 +161,34 @@ export const updateHasil = async (req, res) => {
   try {
     const nilai_alternatif = await NilaiAlternatif.findAll();
     const data_alternatif = await Alternatif.findAll();
-// console.log(data_alternatif)
 
-// Untuk mengelompokkan data
+    // Mengelompokkan data berdasarkan kriteria
     const groupedData = {};
     nilai_alternatif.forEach(({ nama_alternatif, nama_kriteria, nilai_fuzzy }) => {
-      groupedData[nama_kriteria] = groupedData[nama_kriteria] || [];
+      if (!groupedData[nama_kriteria]) {
+        groupedData[nama_kriteria] = [];
+      }
       groupedData[nama_kriteria].push({ nama_alternatif, nilai_fuzzy });
     });
 
-    // untuk menghitung nilai fuzzy
+    // Menghitung nilai total kuadrat untuk setiap kriteria
     const squareRootValues = {};
-    for (const [nama_kriteria, data] of Object.entries(groupedData)) {
+    Object.entries(groupedData).forEach(([nama_kriteria, data]) => {
       const totalSquaredValue = data.reduce((total, { nilai_fuzzy }) => total + Math.pow(nilai_fuzzy, 2), 0);
       squareRootValues[nama_kriteria] = Math.sqrt(totalSquaredValue);
-    }
+    });
 
+    // Normalisasi nilai fuzzy
     const dividedValues = {};
-    for (const [nama_kriteria, data] of Object.entries(groupedData)) {
+    Object.entries(groupedData).forEach(([nama_kriteria, data]) => {
       const squareRootValue = squareRootValues[nama_kriteria];
       dividedValues[nama_kriteria] = data.map(({ nama_alternatif, nilai_fuzzy }) => ({
         nama_alternatif,
-        nilai_fuzzy: nilai_fuzzy / squareRootValue
+        nilai_fuzzy: nilai_fuzzy / squareRootValue,
       }));
-    }
+    });
 
+    // Mengalikan dengan bobot kriteria
     const bobotKriteria = {};
     const dataKriteria = await Kriteria.findAll();
     dataKriteria.forEach(({ nama_kriteria, bobot_kriteria }) => {
@@ -193,69 +196,63 @@ export const updateHasil = async (req, res) => {
     });
 
     const multipliedValues = {};
-    for (const [nama_kriteria, data] of Object.entries(dividedValues)) {
+    Object.entries(dividedValues).forEach(([nama_kriteria, data]) => {
       const bobot = bobotKriteria[nama_kriteria];
       multipliedValues[nama_kriteria] = data.map(({ nama_alternatif, nilai_fuzzy }) => ({
         nama_alternatif,
-        nilai_fuzzy: nilai_fuzzy * bobot
+        nilai_fuzzy: nilai_fuzzy * bobot,
       }));
-    }
+    });
 
+    // Mengakumulasi nilai fuzzy dengan tanda (+ atau -) sesuai dengan kriteria benefit dan cost
     const summedValues = {};
-    for (const [nama_kriteria, data] of Object.entries(multipliedValues)) {
+    Object.entries(multipliedValues).forEach(([nama_kriteria, data]) => {
       data.forEach(({ nama_alternatif, nilai_fuzzy }) => {
-        summedValues[nama_alternatif] = (summedValues[nama_alternatif] || 0) + (nilai_fuzzy * (nama_kriteria === "Rata - Rata Nilai Rapot" || nama_kriteria === "Usia" ? 1 : -1));
+        if (!summedValues[nama_alternatif]) {
+          summedValues[nama_alternatif] = 0;
+        }
+        // Periksa apakah kriteria adalah benefit atau cost
+        const sign = ["Rata - Rata Nilai Rapot", "Usia"].includes(nama_kriteria) ? 1 : -1; // Asumsikan kriteria ini adalah benefit
+        summedValues[nama_alternatif] += nilai_fuzzy * sign;
       });
+    });
+
+    // Menghapus data hasil yang tidak cocok
+    const idDataAlternatif = data_alternatif.map(alternatif => alternatif.id);
+    const hasilYangTidakCocok = await Hasil.findAll({
+      where: {
+        dataAlternatifId: {
+          [Op.notIn]: idDataAlternatif,
+        },
+      },
+    });
+
+    for (const hasil of hasilYangTidakCocok) {
+      await hasil.destroy();
     }
 
-    // console.log(summedValues);
-      try {
-        const idDataAlternatif = data_alternatif.map((alternatif) => alternatif.id);
-        // Filter hasil yang tidak memiliki ID yang cocok dengan ID data alternatif
-        const hasilYangTidakCocok = await Hasil.findAll({
-            where: {
-                dataAlternatifId: {
-                    [Op.notIn]: idDataAlternatif // Filter hasil yang tidak ada di ID data alternatif
-                }
-            }
-        });
-        // Hapus hasil yang tidak cocok
-        for (const hasil of hasilYangTidakCocok) {
-            await hasil.destroy();
+    // Memperbarui atau menambahkan data hasil baru
+    for (const [nama_alternatif, nilai_fuzzy] of Object.entries(summedValues)) {
+      const dataAlternatif = data_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif);
+      if (dataAlternatif) {
+        const { id: dataAlternatifId, nama_jalur: jalur_pendaftaran } = dataAlternatif;
+        const hasil = await Hasil.findOne({ where: { dataAlternatifId } });
+        if (hasil) {
+          await hasil.update({ nama_alternatif, nilai: nilai_fuzzy, jalur_pendaftaran });
+        } else {
+          await Hasil.create({ dataAlternatifId, nama_alternatif, nilai: nilai_fuzzy, jalur_pendaftaran });
         }
-        
-        // Update hasil per alternatif ke dalam tabel Hasil
-        for (const [nama_alternatif, nilai_fuzzy] of Object.entries(summedValues)) {
-            // Temukan data Hasil yang sesuai dengan nama_alternatif
-            const dataAlternatif = data_alternatif.find(({ nama_alternatif: nama }) => nama === nama_alternatif);
-            if (dataAlternatif) {
-                const dataAlternatifId = dataAlternatif.id;
-                const hasil = await Hasil.findOne({ where: { dataAlternatifId } });
-                if (hasil) {
-                    // Dapatkan jalur_pendaftaran dari tabel data_alternatif
-                    const jalur_pendaftaran = dataAlternatif.nama_jalur;
-                    // Update nilai hasil
-                    await hasil.update({
-                      nama_alternatif,
-                      nilai: nilai_fuzzy,
-                      jalur_pendaftaran
-                    });
-                }
-            }
-        }
-    } catch (error) {
-      console.error("Gagal mengupdate data hasil di tabel Hasil", error);
-      // Tangani kesalahan jika penyisipan gagal
-      return res.status(500).json({ msg: "Terjadi kesalahan pada server" });
+      }
     }
-    // Beri respons dengan pesan sukses setelah semua catatan dimasukkan
+
     res.status(200).json({ msg: "Data Hasil Berhasil Diupdate" });
   } catch (error) {
     console.error("Error:", error);
-    // Tangani kesalahan jika pengambilan catatan gagal
     res.status(500).json({ msg: "Terjadi kesalahan pada server" });
   }
 };
+
+
 
 
 //HAPUS Hasil
